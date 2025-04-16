@@ -12,8 +12,8 @@ class FallbackSwitchBase:
         "If {input_2_opt} is not provided (e.g. the connected node is muted or bypassed), it will fall back to {input_1}. "
         "A message will be printed to console if this happens."
     )
-    TOOLTIP_1 = "The input to output if boolean is True. Will be used as fallback if {input_2_opt} is not provided."
-    TOOLTIP_2 = (
+    TOOLTIP_INPUT_1 = "The input to output if boolean is True. Will be used as fallback if {input_2_opt} is not provided."
+    TOOLTIP_INPUT_2 = (
         "The input to output if boolean is False. If not provided (e.g. the connected node is muted or bypassed), "
         "{input_1} will be used as fallback and a message will be printed to console if this happens. This input is optional."
     )
@@ -38,7 +38,7 @@ class FallbackSwitchBase:
                 cls.INPUT_NAME_1: (
                     cls.TYPE,
                     {
-                        "tooltip": cls.TOOLTIP_1.format(
+                        "tooltip": cls.TOOLTIP_INPUT_1.format(
                             input_1=cls.INPUT_NAME_1,
                             input_2_opt=cls.INPUT_NAME_2,
                         ),
@@ -49,7 +49,7 @@ class FallbackSwitchBase:
                 cls.INPUT_NAME_2: (
                     cls.TYPE,
                     {
-                        "tooltip": cls.TOOLTIP_2.format(
+                        "tooltip": cls.TOOLTIP_INPUT_2.format(
                             input_1=cls.INPUT_NAME_1,
                             input_2_opt=cls.INPUT_NAME_2,
                         ),

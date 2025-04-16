@@ -1,4 +1,5 @@
-from ..common import AnyType, FallbackSwitchBase
+from ..modules.utils.any_type import AnyType
+from ..modules.fallback_switch_base import FallbackSwitchBase
 
 class AnySwitchFallback(FallbackSwitchBase):
     """RyuuNoodles Any Switch Fallback Node.

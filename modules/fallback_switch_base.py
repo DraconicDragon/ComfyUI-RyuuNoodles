@@ -1,4 +1,4 @@
-from ..common import AnyType, ryuu_print
+from ..modules.utils.any_type import AnyType
 
 
 class FallbackSwitchBase:

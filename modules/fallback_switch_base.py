@@ -1,4 +1,5 @@
 from ..modules.utils.any_type import AnyType
+from ..modules.utils.ryuu_print import ryuu_print
 
 
 class FallbackSwitchBase:

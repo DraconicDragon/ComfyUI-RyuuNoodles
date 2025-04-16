@@ -1,4 +1,6 @@
-from ..common import ryuu_print
+from ..common import AnyType, ryuu_print
+
+any_type = AnyType("*")
 
 
 class AnySwitchFallback:
@@ -22,7 +24,7 @@ class AnySwitchFallback:
                     },
                 ),
                 "image_1": (
-                    "IMAGE",
+                    any_type,
                     {
                         "tooltip": "The image to output if boolean is True. Will be used as fallback if image_2_opt is not provided",
                     },
@@ -30,7 +32,7 @@ class AnySwitchFallback:
             },
             "optional": {
                 "image_2_opt": (
-                    "IMAGE",
+                    any_type,
                     {
                         "tooltip": "The image to output if boolean is False. If not provided, image_1 will be used as fallback."
                     },
@@ -38,7 +40,7 @@ class AnySwitchFallback:
             },
         }
 
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = (any_type,)
     FUNCTION = "do_thing"
     OUTPUT_NODE = True
 

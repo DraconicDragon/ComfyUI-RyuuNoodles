@@ -1,4 +1,4 @@
-from common import ryuu_print
+from ..common import ryuu_print
 
 
 class AnySwitchFallback:

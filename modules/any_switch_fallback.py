@@ -5,10 +5,10 @@ any_type = AnyType("*")
 
 class AnySwitchFallback:
     """RyuuNoodles Any Switch Fallback Node.
-    This node takes a boolean input and two image inputs.
+    This node has a boolean option and two inputs that can by any type.
     If the boolean is True, it returns input_1.
-    If the boolean is False, it returns image2.
-    If image2 is not provided, it falls back to input_1 and a message will be printed to console.
+    If the boolean is False, it returns input_2_opt.
+    If input_2_opt is not provided, it falls back to input_1 and a message will be printed to console.
     """
 
     @classmethod
@@ -27,7 +27,7 @@ class AnySwitchFallback:
                 "input_1": (
                     any_type,
                     {
-                        "tooltip": "The image to output if boolean is True. Will be used as fallback if input_2_opt is not provided",
+                        "tooltip": "The input to output if boolean is True. Will be used as fallback if input_2_opt is not provided",
                     },
                 ),
             },
@@ -35,7 +35,7 @@ class AnySwitchFallback:
                 "input_2_opt": (
                     any_type,
                     {
-                        "tooltip": "The image to output if boolean is False. If not provided, input_1 will be used as fallback."
+                        "tooltip": "The input to output if boolean is False. If not provided, input_1 will be used as fallback."
                     },
                 ),
             },

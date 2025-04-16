@@ -13,13 +13,22 @@ class FallbackSwitchBase:
         "If {input_2_opt} is not provided (e.g. the connected node is muted or bypassed), it will fall back to {input_1}. "
         "A message will be printed to console if this happens."
     )
-    TOOLTIP_INPUT_1 = "The input to output if boolean is True. Will be used as fallback if {input_2_opt} is not provided."
+    TOOLTIP_INPUT_1 = (
+        "The input to output if boolean is True. Will be used as fallback if {input_2_opt} is not provided."
+    )
     TOOLTIP_INPUT_2 = (
         "The input to output if boolean is False. If not provided (e.g. the connected node is muted or bypassed), "
         "{input_1} will be used as fallback and a message will be printed to console if this happens. This input is optional."
     )
 
-    CATEGORY = "RyuuNoodles/Util/Switches"
+    DESCRIPTION = (
+        "This node allows for 2 inputs where the second input is chosen if it's provided as well as if the boolean switch is set to false, "
+        "and otherwise the first input is used as fallback. "
+        "Use the boolean switch to choose preference between the two inputs. "
+        'If you want the same node without the boolean input, use "Passthrough 🐲"'
+    )
+
+    CATEGORY = "RyuuNoodles/Util"
     OUTPUT_NODE = True
 
     @classmethod

@@ -8,7 +8,7 @@ class AnySwitchFallback:
     This node takes a boolean input and two image inputs.
     If the boolean is True, it returns image_1.
     If the boolean is False, it returns image2.
-    If image2 is not provided, it falls back to image_1.
+    If image2 is not provided, it falls back to image_1 and a message will be printed to console.
     """
 
     @classmethod
@@ -20,7 +20,8 @@ class AnySwitchFallback:
                     {
                         "default": False,
                         "tooltip": "True will output image_1, False will try to output image_2_opt. "
-                        + "If image_2_opt is not provided (if for example the connected node is muted or bypassed), it will fall back to image_1.",
+                        + "If image_2_opt is not provided (if for example the connected node is muted or bypassed), it will fall back to image_1. "
+                        + "A message will be printed to console if this happens.",
                     },
                 ),
                 "image_1": (

@@ -8,7 +8,7 @@ NODE_CLASS_MAPPINGS = {
     "FallbackPassthrough": FallbackPassthrough,
 }
 
-NODE_DISPLAY_NAME_MAPPINGS = {
+NODE_DISPLAY_NAME_MAPPINGS = { # maybe use 🍜 instead so colors clash less with custom scripts?
     "FallbackSwitchAny": "Switch Any Fallback 🐲",
     "FallbackSwitchImage": "Switch Image Fallback 🐲",
     "FallbackSwitchLatent": "Switch Latent Fallback 🐲",

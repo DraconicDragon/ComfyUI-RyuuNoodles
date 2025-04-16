@@ -17,13 +17,24 @@ class AnySwitchFallback:
                     "BOOLEAN",
                     {
                         "default": False,
-                        "tooltip": "NotImplemented",
+                        "tooltip": "True will output image_1, False will try to output image_2_opt. "
+                        + "If image_2_opt is not provided (if for example the connected node is muted or bypassed), it will fall back to image_1.",
                     },
                 ),
-                "image_1": ("IMAGE",),
+                "image_1": (
+                    "IMAGE",
+                    {
+                        "tooltip": "The image to output if boolean is True. Will be used as fallback if image_2_opt is not provided",
+                    },
+                ),
             },
             "optional": {
-                "image_2_opt": ("IMAGE",),
+                "image_2_opt": (
+                    "IMAGE",
+                    {
+                        "tooltip": "The image to output if boolean is False. If not provided, image_1 will be used as fallback."
+                    },
+                ),
             },
         }
 

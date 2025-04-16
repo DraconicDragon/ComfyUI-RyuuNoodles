@@ -1,15 +1,15 @@
 from .modules.fallback_switches import *
 
 NODE_CLASS_MAPPINGS = {
-    "AnySwitchFallback": AnySwitchFallback,
-    "ImageSwitchFallback": ImageSwitchFallback,
-    "LatentSwitchFallback": LatentSwitchFallback,
+    "FallbackSwitchAny": FallbackSwitchAny,
+    "FallbackSwitchImage": FallbackSwitchImage,
+    "FallbackSwitchLatent": FallbackSwitchLatent,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "AnySwitchFallback": "Switch Any Fallback 🐲",
-    "ImageSwitchFallback": "Switch Image Fallback 🐲",
-    "SwitchFallback": "Switch Latent Fallback 🐲",
+    "FallbackSwitchAny": "Switch Any Fallback 🐲",
+    "FallbackSwitchImage": "Switch Image Fallback 🐲",
+    "FallbackSwitchLatent": "Switch Latent Fallback 🐲",
 }
 
 WEB_DIRECTORY = "./js"

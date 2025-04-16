@@ -1,7 +1,7 @@
 from ..modules.utils.any_type import AnyType
 from ..modules.fallback_switch_base import FallbackSwitchBase
 
-class AnySwitchFallback(FallbackSwitchBase):
+class FallbackSwitchAny(FallbackSwitchBase):
     """RyuuNoodles Any Switch Fallback Node.
 
     This node has a boolean option and two inputs that can be any type.
@@ -15,7 +15,7 @@ class AnySwitchFallback(FallbackSwitchBase):
     INPUT_NAME_2 = "input_2_opt"
 
 
-class ImageSwitchFallback(FallbackSwitchBase):
+class FallbackSwitchImage(FallbackSwitchBase):
     """RyuuNoodles Image Switch Fallback Node.
 
     This node has a boolean option and two image inputs.
@@ -29,7 +29,7 @@ class ImageSwitchFallback(FallbackSwitchBase):
     INPUT_NAME_2 = "image_2_opt"
 
 
-class LatentSwitchFallback(FallbackSwitchBase):
+class FallbackSwitchLatent(FallbackSwitchBase):
     """RyuuNoodles Latent Switch Fallback Node.
 
     This node has a boolean option and two latent inputs.

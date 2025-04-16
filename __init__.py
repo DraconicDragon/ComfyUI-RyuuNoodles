@@ -1,11 +1,15 @@
 from .modules.fallback_passthrough import FallbackPassthrough
 from .modules.fallback_switches import *
+from .modules.number_ops import FloatSlider, FloatPlain, IntSlider
 
 NODE_CLASS_MAPPINGS = {
     "Ryuu_FallbackSwitchAny": FallbackSwitchAny,
     "Ryuu_FallbackSwitchImage": FallbackSwitchImage,
     "Ryuu_FallbackSwitchLatent": FallbackSwitchLatent,
     "Ryuu_FallbackPassthrough": FallbackPassthrough,
+    "Ryuu_FloatSlider": FloatSlider,
+    "Ryuu_FloatPlain": FloatPlain,
+    "Ryuu_IntSlider": IntSlider,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = { # maybe use 🍜 instead so colors clash less with custom scripts?
@@ -13,6 +17,9 @@ NODE_DISPLAY_NAME_MAPPINGS = { # maybe use 🍜 instead so colors clash less wit
     "Ryuu_FallbackSwitchImage": "Switch Image Fallback 🐲",
     "Ryuu_FallbackSwitchLatent": "Switch Latent Fallback 🐲",
     "Ryuu_FallbackPassthrough": "Passthrough 🐲",
+    "Ryuu_FloatSlider": "Float Slider 🐲",
+    "Ryuu_FloatPlain": "Float 🐲",
+    "Ryuu_IntSlider": "Int Slider 🐲",
 }
 
 WEB_DIRECTORY = "./js"

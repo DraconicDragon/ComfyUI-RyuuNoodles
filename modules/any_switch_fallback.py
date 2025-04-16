@@ -1,4 +1,4 @@
-from ..modules.ryuu_print import ryuu_print
+from common import ryuu_print
 
 
 class AnySwitchFallback:
@@ -33,12 +33,7 @@ class AnySwitchFallback:
 
     CATEGORY = "RyuuNoodles/Util"
 
-    def do_thing(
-        self,
-        boolean,
-        image_1,
-        image_2_opt=None,
-    ):
+    def do_thing(self, boolean, image_1, image_2_opt=None):
         if boolean:
             return (image_1,)
         else:

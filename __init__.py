@@ -1,4 +1,4 @@
-from .modules.any_switch_fallback import *
+from .modules.fallback_switches import *
 
 
 NODE_CLASS_MAPPINGS = {

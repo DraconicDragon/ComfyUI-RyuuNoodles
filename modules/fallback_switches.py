@@ -40,3 +40,10 @@ class LatentSwitchFallback(FallbackSwitchBase):
     TYPE = "LATENT"
     INPUT_NAME_1 = "latent_1"
     INPUT_NAME_2 = "latent_2_opt"
+
+
+# class CustomSwitchFallback(FallbackSwitchBase):
+#     """A Custom Switch node"""
+#     TYPE = AnyType("*")
+#     INPUT_NAME_1 = "custom_input_1"
+#     INPUT_NAME_2 = "custom_input_2_opt"

@@ -1,3 +1,6 @@
+from ..modules.ryuu_print import ryuu_print
+
+
 class AnySwitchFallback:
     """RyuuNoodles Any Switch Fallback Node.
     This node takes a boolean input and two image inputs.
@@ -42,5 +45,5 @@ class AnySwitchFallback:
             if image_2_opt is not None:
                 return (image_2_opt,)
             else:
-                print("No image_2_opt provided, falling back to image_1")
+                ryuu_print("No image_2_opt provided, falling back to image_1")
                 return (image_1,)

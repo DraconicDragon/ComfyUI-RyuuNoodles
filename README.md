@@ -2,7 +2,7 @@
 
 Collection of one or more custom nodes for ComfyUI made mainly for personal use <sub><sub><sub>...rawr...</sub></sub></sub>
 
-## Live Token Counter / Character Counter Textbox (CLIP only right now)
+## Live Token Counter / Character Counter Textbox (CLIP-L only right now)
 
 ![Live token counter textbox showcase](assets/tokencounter_showcase.gif)
 

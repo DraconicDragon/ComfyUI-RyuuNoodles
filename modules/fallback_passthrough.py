@@ -43,5 +43,5 @@ class FallbackPassthrough:
         if input_2_opt is not None:
             return (input_2_opt,)
         else:
-            ryuu_print(f"No input_2_opt provided, falling back to input_1")
+            ryuu_print("No input_2_opt provided, falling back to input_1")
             return (input_1,)

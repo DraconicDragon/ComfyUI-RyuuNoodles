@@ -10,7 +10,7 @@ class NumberNodeBase:
 
     @classmethod
     def INPUT_TYPES(cls):
-        slider_config = {
+        slider_config: dict[str, float | int | str] = {
             "default": cls.DEFAULT,
             "min": cls.MIN,
             "max": cls.MAX,

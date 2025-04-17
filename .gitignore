@@ -1,6 +1,7 @@
 # repo specific
 t.md
 test.py
+node.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

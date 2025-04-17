@@ -1,18 +1,24 @@
 from .modules.fallback_passthrough import FallbackPassthrough
-from .modules.fallback_switches import *
+from .modules.fallback_switches import (
+    FallbackSwitchAny,
+    FallbackSwitchImage,
+    FallbackSwitchLatent,
+)
 from .modules.number_ops import FloatPlain, FloatSlider, IntSlider
 from .modules.token_count_textbox import TokenCountTextBox
-
 from .pyserver import update_token_count
 
 NODE_CLASS_MAPPINGS = {
+    # Switches and Passthrough nodes
+    "Ryuu_FallbackPassthrough": FallbackPassthrough,
     "Ryuu_FallbackSwitchAny": FallbackSwitchAny,
     "Ryuu_FallbackSwitchImage": FallbackSwitchImage,
     "Ryuu_FallbackSwitchLatent": FallbackSwitchLatent,
-    "Ryuu_FallbackPassthrough": FallbackPassthrough,
-    "Ryuu_FloatSlider": FloatSlider,
+    # Number operation nodes
     "Ryuu_FloatPlain": FloatPlain,
+    "Ryuu_FloatSlider": FloatSlider,
     "Ryuu_IntSlider": IntSlider,
+    # Token Counter
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
 }
 

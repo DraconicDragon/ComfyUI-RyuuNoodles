@@ -6,6 +6,7 @@ from transformers import CLIPTokenizer
 tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")
 routes = PromptServer.instance.routes
 
+# todo: add support for T5 etc. tokenizers
 
 @routes.post("/ryuu/update_token_count")
 async def update_token_count(request):
@@ -17,7 +18,7 @@ async def update_token_count(request):
     text = data.get("text", "")
     if not text:
         return web.json_response({"error": "No text provided"}, status=400)
-    print(text)
+    
     tokens = tokenizer(text, return_tensors="pt")
     num_tokens = tokens["input_ids"].shape[1]
     num_tokens = num_tokens - 2 # Doing minus 2 because start/end tokens are not included 

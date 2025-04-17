@@ -11,6 +11,7 @@ app.registerExtension({
             nodeType.prototype.onNodeCreated = function () {
                 onConfigure?.apply(this, arguments);
                 // Button used like a label
+                // todo: check rgthree-comfy fork/PRs for how lora path is added to node and use same method
                 let charCountWidget = {
                     type: "button",
                     name: "Token Count: 0 | Character count: 0",

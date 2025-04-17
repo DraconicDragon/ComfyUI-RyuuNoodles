@@ -41,7 +41,7 @@ class FloatSlider(NumberNodeBase):
     SLIDER_DISPLAY = True
     NUMBER_TYPE = "FLOAT"
     RETURN_TYPES = (NUMBER_TYPE,)
-    DEFAULT = 0.542
+    DEFAULT = 0.345
     MIN = 0.0
     MAX = 1.0
     STEP = 0.005
@@ -51,7 +51,7 @@ class FloatPlain(NumberNodeBase):
     SLIDER_DISPLAY = False
     NUMBER_TYPE = "FLOAT"
     RETURN_TYPES = (NUMBER_TYPE,)
-    DEFAULT = 0.542
+    DEFAULT = 0.765
     MIN = 0.0
     MAX = 1.0
     STEP = 0.005

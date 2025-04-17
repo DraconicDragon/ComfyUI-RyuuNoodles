@@ -12,8 +12,8 @@ app.registerExtension({
                 onConfigure?.apply(this, arguments);
                 // Button used like a label
                 let charCountWidget = {
-                    type: "button", name: "Character count: 0", callback: () => {
-                        alert("u stinky stop pressing this buttongggg");
+                    type: "button", name: "Token Count: 0 | Character count: 0", callback: () => {
+                        alert("u stinky stop pressing this buttonggg idk how to not make it a button");
                     }
                 };
                 this.widgets.splice(0, 0, charCountWidget); // Insert at the top of the widget list
@@ -25,7 +25,7 @@ app.registerExtension({
                     const inputText = this.widgets.find(w => w.name === "input_text")?.value || "";
                     if (inputText === lastText) return;
                     lastText = inputText;
-                    
+
                     const response = await api.fetchApi("/ryuu/update_token_count", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },

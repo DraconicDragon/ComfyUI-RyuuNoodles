@@ -24,7 +24,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FloatSlider": "Float Slider 🐲",
     "Ryuu_FloatPlain": "Float 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
-    "Ryuu_TokenCountTextBox": "Token Count Textbox 🐲",
+    "Ryuu_TokenCountTextBox": "Token Counter Textbox 🐲",
 }
 
 WEB_DIRECTORY = "./js"

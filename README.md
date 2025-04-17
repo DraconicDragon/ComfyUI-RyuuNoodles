@@ -6,6 +6,8 @@ Collection of one or more custom nodes for ComfyUI made mainly for personal use 
 
 ![Live token counter textbox showcase](assets/tokencounter_showcase.gif)
 This was easier to add than I thought although I still want to figure out how to make it an actual label kind of thing instead of using a button as substitute, but its working fine. Update rate is once per second for now defined in the JS. <sub><sub>maybe its possible to make it so it hijacks other nodes</sub></sub>
+<details><summary>The workings</summary>It just downloads the json files and merge.txt (not the actual model) from openai/clip-vit-large-patch14 using hf transformers and tokenizes the text then, as i said: very simple
+there is a standalone version here: https://gist.github.com/DraconicDragon/10ac26d0d11ea9b14a0edae5d728bc96</details>
 
 ## Switches with Fallback
 

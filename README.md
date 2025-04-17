@@ -7,7 +7,8 @@ Collection of one or more custom nodes for ComfyUI made mainly for personal use 
 ![Live token counter textbox showcase](assets/tokencounter_showcase.gif)
 This was easier to add than I thought although I still want to figure out how to make it an actual label kind of thing instead of using a button as substitute, but its working fine. Update rate is once per second for now defined in the JS. <sub><sub>maybe its possible to make it so it hijacks other nodes</sub></sub>
 <details><summary>The workings</summary>It just downloads the json files and merge.txt (not the actual model) from openai/clip-vit-large-patch14 using hf transformers and tokenizes the text then, as i said: very simple
-there is a standalone version here: https://gist.github.com/DraconicDragon/10ac26d0d11ea9b14a0edae5d728bc96</details>
+
+There is a standalone version here: https://gist.github.com/DraconicDragon/10ac26d0d11ea9b14a0edae5d728bc96</details>
 
 ## Switches with Fallback
 
@@ -16,6 +17,7 @@ The Switch Any Fallback node is probably the best choice here <sub>although ther
 ![Showcase for switch nodes](assets/switches_showcase.png)
 (True = input 1 will be chosen; False = input 2 will be attempted to be chosen, if fail due to input being None, output will use input 1 data and a message will be printed to console)
 <details><summary>Some random note</summary>I briefly had the idea of allowing the user to add more switch nodes through a yaml with multiple inputs but I think this isn't good for reproducability/sharing the workflow.
+
 A solution to still have a similar kind of thing is making a switch node that would allow a dynamic amount of inputs that increases using an option on the node or increases by 1 as inputs are being populated, however ComfyUI frontend updates are moving fast any changing how inputs work, and it seems like it breaks things like this (as can be seen on the Impact Pack Switch (Any) node as of writing, it doesn't create new inputs anymore) so I'm holding off working on that</details>
 
 ### Passthrough node

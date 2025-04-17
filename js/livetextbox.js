@@ -23,7 +23,7 @@ app.registerExtension({
                 // make the interval callback async so we can await the fetch…
                 setInterval(async () => {
                     const inputText = this.widgets.find(w => w.name === "input_text")?.value || "";
-                    if (inputText === lastText) return;
+                    if (inputText === lastText) return; // stop early if no change to not waste time on api call
                     lastText = inputText;
 
                     const response = await api.fetchApi("/ryuu/update_token_count", {

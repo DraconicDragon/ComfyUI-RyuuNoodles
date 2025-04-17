@@ -6,8 +6,6 @@ class NumberNodeBase:
     MAX: float | int = 1.0
     STEP: float | int = 0.005
 
-    DESCRIPTION = "Allows for setting a number value and outputs the value rounded to 3 decimal places."
-
     @classmethod
     def INPUT_TYPES(cls):
         slider_config: dict[str, float | int | str] = {
@@ -45,6 +43,10 @@ class FloatSlider(NumberNodeBase):
     MIN = 0.0
     MAX = 1.0
     STEP = 0.005
+    DESCRIPTION = (
+        "Allows for setting a float value with a slider display and outputs the value rounded to 3 decimal places. \n"
+        f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
+    )
 
 
 class FloatPlain(NumberNodeBase):
@@ -55,6 +57,10 @@ class FloatPlain(NumberNodeBase):
     MIN = 0.0
     MAX = 1.0
     STEP = 0.005
+    DESCRIPTION = (
+        "Allows for setting a float value and outputs the value rounded to 3 decimal places. \n"
+        f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
+    )
 
 
 class IntSlider(NumberNodeBase):
@@ -65,3 +71,6 @@ class IntSlider(NumberNodeBase):
     MIN = 0
     MAX = 50
     STEP = 1
+    DESCRIPTION = (
+        "Allows for setting an int value with a slider display. \n" f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
+    )

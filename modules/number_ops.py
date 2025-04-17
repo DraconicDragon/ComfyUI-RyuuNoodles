@@ -29,7 +29,6 @@ class NumberNodeBase:
             }
         }
 
-    RETURN_TYPES = ("FLOAT",)
     FUNCTION = "run"
     OUTPUT_NODE = True
     CATEGORY = "RyuuNoodles/Util"
@@ -41,6 +40,7 @@ class NumberNodeBase:
 class FloatSlider(NumberNodeBase):
     SLIDER_DISPLAY = True
     NUMBER_TYPE = "FLOAT"
+    RETURN_TYPES = (NUMBER_TYPE,)
     DEFAULT = 0.542
     MIN = 0.0
     MAX = 1.0
@@ -50,6 +50,7 @@ class FloatSlider(NumberNodeBase):
 class FloatPlain(NumberNodeBase):
     SLIDER_DISPLAY = False
     NUMBER_TYPE = "FLOAT"
+    RETURN_TYPES = (NUMBER_TYPE,)
     DEFAULT = 0.542
     MIN = 0.0
     MAX = 1.0
@@ -59,6 +60,7 @@ class FloatPlain(NumberNodeBase):
 class IntSlider(NumberNodeBase):
     SLIDER_DISPLAY = True
     NUMBER_TYPE = "INT"
+    RETURN_TYPES = (NUMBER_TYPE,)
     DEFAULT = 25
     MIN = 0
     MAX = 50

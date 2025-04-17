@@ -32,5 +32,6 @@ Has the same functionality as the switch nodes, just without the boolean switch.
 
 ![numbers and sliders nodes showcase](assets/numbers_and_sliders.gif)
 
+(ignore that int slider says output is FLOAT, its fixed but too lazy to update gif)
 Yeah I really just wanted these and yeah, those limits are real (and not configurable as of now): float nodes only do 0.0 to 1.0 with the second one having a stepping of 0.005 and the Int Slider has a limit of 0-50 with a stepping of 1.
 Both of the float nodes round with three decimal places to keep the funny rounding "error" thingy away.

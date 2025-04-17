@@ -68,7 +68,6 @@ class FallbackSwitchBase:
             },
         }
 
-    RETURN_TYPES = (TYPE,)
     FUNCTION = "do_thing"
 
     def do_thing(self, boolean, **kwargs):

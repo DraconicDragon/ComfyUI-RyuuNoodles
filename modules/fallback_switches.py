@@ -1,5 +1,6 @@
-from ..modules.utils.any_type import AnyType
 from ..modules.fallback_switch_base import FallbackSwitchBase
+from ..modules.utils.any_type import AnyType
+
 
 class FallbackSwitchAny(FallbackSwitchBase):
     """RyuuNoodles Any Switch Fallback Node.
@@ -11,6 +12,7 @@ class FallbackSwitchAny(FallbackSwitchBase):
     """
 
     TYPE = AnyType("*")
+    RETURN_TYPES = (TYPE,)
     INPUT_NAME_1 = "input_1"
     INPUT_NAME_2 = "input_2_opt"
 
@@ -25,6 +27,7 @@ class FallbackSwitchImage(FallbackSwitchBase):
     """
 
     TYPE = "IMAGE"
+    RETURN_TYPES = (TYPE,)
     INPUT_NAME_1 = "image_1"
     INPUT_NAME_2 = "image_2_opt"
 
@@ -39,6 +42,7 @@ class FallbackSwitchLatent(FallbackSwitchBase):
     """
 
     TYPE = "LATENT"
+    RETURN_TYPES = (TYPE,)
     INPUT_NAME_1 = "latent_1"
     INPUT_NAME_2 = "latent_2_opt"
 

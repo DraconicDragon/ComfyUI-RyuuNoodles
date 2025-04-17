@@ -35,20 +35,6 @@ class NumberNodeBase:
         return (round(number, 3),)
 
 
-class FloatSlider(NumberNodeBase):
-    SLIDER_DISPLAY = True
-    NUMBER_TYPE = "FLOAT"
-    RETURN_TYPES = (NUMBER_TYPE,)
-    DEFAULT = 0.345
-    MIN = 0.0
-    MAX = 1.0
-    STEP = 0.005
-    DESCRIPTION = (
-        "Allows for setting a float value with a slider display and outputs the value rounded to 3 decimal places. \n"
-        f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
-    )
-
-
 class FloatPlain(NumberNodeBase):
     SLIDER_DISPLAY = False
     NUMBER_TYPE = "FLOAT"
@@ -59,6 +45,34 @@ class FloatPlain(NumberNodeBase):
     STEP = 0.005
     DESCRIPTION = (
         "Allows for setting a float value and outputs the value rounded to 3 decimal places. \n"
+        f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
+    )
+
+
+class FloatPlainLarger(NumberNodeBase):
+    SLIDER_DISPLAY = False
+    NUMBER_TYPE = "FLOAT"
+    RETURN_TYPES = (NUMBER_TYPE,)
+    DEFAULT = 3.75
+    MIN = 0.0
+    MAX = 24.0
+    STEP = 0.05
+    DESCRIPTION = (
+        "Allows for setting a float value and outputs the value rounded to 3 decimal places. \n"
+        f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
+    )
+
+
+class FloatSlider(NumberNodeBase):
+    SLIDER_DISPLAY = True
+    NUMBER_TYPE = "FLOAT"
+    RETURN_TYPES = (NUMBER_TYPE,)
+    DEFAULT = 0.345
+    MIN = 0.0
+    MAX = 1.0
+    STEP = 0.005
+    DESCRIPTION = (
+        "Allows for setting a float value with a slider display and outputs the value rounded to 3 decimal places. \n"
         f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
     )
 

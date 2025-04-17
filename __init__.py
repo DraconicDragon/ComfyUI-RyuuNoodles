@@ -4,7 +4,7 @@ from .modules.fallback_switches import (
     FallbackSwitchImage,
     FallbackSwitchLatent,
 )
-from .modules.number_ops import FloatPlain, FloatSlider, IntSlider
+from .modules.number_ops import FloatPlain, FloatPlainLarger, FloatSlider, IntSlider
 from .modules.token_count_textbox import TokenCountTextBox
 from .pyserver import update_token_count
 
@@ -16,6 +16,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_FallbackSwitchLatent": FallbackSwitchLatent,
     # Number operation nodes
     "Ryuu_FloatPlain": FloatPlain,
+    "Ryuu_FloatPlainLarger": FloatPlainLarger,
     "Ryuu_FloatSlider": FloatSlider,
     "Ryuu_IntSlider": IntSlider,
     # Token Counter
@@ -29,6 +30,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FallbackPassthrough": "Passthrough 🐲",
     "Ryuu_FloatSlider": "Float Slider 🐲",
     "Ryuu_FloatPlain": "Float 🐲",
+    "Ryuu_FloatPlainLarger": "Float L 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
     "Ryuu_TokenCountTextBox": "Token Counter Textbox (CLIP-L) 🐲",
 }

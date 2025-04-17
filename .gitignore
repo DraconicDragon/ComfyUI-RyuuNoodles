@@ -1,3 +1,7 @@
+# repo specific
+t.md
+test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

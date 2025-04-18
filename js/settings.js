@@ -16,7 +16,7 @@ app.registerExtension({
                 "Format: 'Node_Name.widget_name:Tokenizer1,Tok2,Tok3;Node_Name2.widget_name:Tok1;'.\n" +
                 "Example: 'Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;'\n" +
                 "Currently accepted tokenizer types: CLIP_L, T5, T5_FAST (T5 is T5xxl) and LLAMA3.",
-            // todo: tooltips look ass, far too small (same goes for the textbox), annoying
+            // todo: tooltips and textbox are far too small for this :pensive:
 
             onChange: async (newVal) => {
                 api.fetchApi("/ryuu/token_count_overlay/update", {

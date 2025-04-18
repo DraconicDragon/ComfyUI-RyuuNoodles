@@ -53,7 +53,7 @@ function startCounting(node, widgetField, tokTypes) {
         node._lastText = inputText;
 
         try {
-            addSpecialTokens = app.extensionManager.setting.get("RyuuNoodles.TokenizerAddSpecialTokens");
+            addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens");
             const resp = await api.fetchApi("/ryuu/update_token_count", { // todo: update endpoint to /ryuu/token_counter/update?
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

@@ -4,7 +4,7 @@ app.registerExtension({
     name: "RyuuNoodles.Settings",
     settings: [
         {
-            id: "RyuuNoodles.TokenCountOverlay", // don't change, use category for name setting
+            id: "RyuuSettings.TokenCountOverlay", // don't change, use category for name setting
             // ["Category name", "Section heading", "Setting label"], but "Settings label" seems to be overwritten by 'name:'
             category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Nodes'],
             name: "Nodes configuration (Reload required on change)",
@@ -20,7 +20,7 @@ app.registerExtension({
         },
 
         {
-            id: "RyuuNoodles.TokenizerAddSpecialTokens",
+            id: "RyuuSettings.TokenizerAddSpecialTokens",
             category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Tokenizer special tokens'],
             name: "Include special tokens",
             type: "boolean",
@@ -29,7 +29,7 @@ app.registerExtension({
                 "E.g: If enabled, CLIP-L will always show 2 tokens more because of 'startoftext' and 'endoftext' tokens " +
                 "which are invisible to the user.",
             onChange: (newVal, oldVal) => {
-                console.log(`RyuuNoodles.TokenizerAddSpecialTokens has been changed from ${oldVal} to ${newVal}`);
+                console.log(`RyuuSettings.TokenizerAddSpecialTokens has been changed from ${oldVal} to ${newVal}`);
             },
         },
     ],

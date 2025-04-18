@@ -1,5 +1,5 @@
 from aiohttp import web
-from server import PromptServer
+from server import PromptServer # type: ignore
 from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast
 
 # load once at module load

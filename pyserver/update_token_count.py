@@ -71,14 +71,8 @@ async def update_token_count(request):
             continue
 
         # run the tokenizer
-        outputs = tokenizer(text, return_tensors="pt")
+        outputs = tokenizer(text, return_tensors="pt", add_special_tokens=False)
         num = outputs["input_ids"].shape[1]
-
-        # subtract special tokens
-        if key.startswith("clip"):
-            num = max(0, num - 2)  # <|startoftext|> and <|endoftext|> tokens
-        if key.startswith("t5"):
-            num = max(0, num - 1)  # apparently this is a thing? </s> i think?
 
         token_counts[name] = num
 

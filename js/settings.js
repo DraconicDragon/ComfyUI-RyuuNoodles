@@ -15,7 +15,7 @@ app.registerExtension({
                 "A token counter will appear above the supplied widget.\n" +
                 "Format: 'Node_Name.widget_name:Tokenizer1,Tok2,Tok3;Node_Name2.widget_name:Tok1;'.\n" +
                 "Example: 'Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;'\n" +
-                "Currently accepted tokenizer types: CLIP_L, T5, T5_FAST and LLAMA3.",
+                "Currently supported tokenizer types: CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW",
             // todo: tooltips and textbox are far too small for this :pensive:
 
             // onChange: async (newVal) => {

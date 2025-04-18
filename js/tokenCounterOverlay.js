@@ -76,8 +76,8 @@ function startCounting(node, widgetField, tokTypes) {
 
 
 async function registerTokenCountNode(nodeType, nodeData) {
-    const cfg = nodeWidgetMapping[nodeData.name];
-    if (!cfg) return;
+    const nodeWidgetMappingConfig = nodeWidgetMapping[nodeData.name];
+    if (!nodeWidgetMappingConfig) return;
 
     // preserve original onDrawForeground
     const originalOnDrawFG = nodeType.prototype.onDrawForeground;
@@ -85,11 +85,11 @@ async function registerTokenCountNode(nodeType, nodeData) {
         originalOnDrawFG?.apply(this, arguments); // call original method, then custom stuff
 
         // find widget & its actual y‑pos (set by LiteGraph)
-        const widget = this.widgets.find(w => w.name === cfg.widget);
+        const widget = this.widgets.find(w => w.name === nodeWidgetMappingConfig.widget);
         if (!widget || widget.last_y == null) return;
 
         // build “Clip L Tokens: 0 | T5🚀 Tokens: 0 | Chars: 0”
-        const parts = cfg.tok_types.map(tt => {
+        const parts = nodeWidgetMappingConfig.tok_types.map(tt => {
             const cnt = this._tokenCounts[tt] || 0;
             return `${prettifyTokenizerName(tt)} Tokens: ${cnt}`;
         });
@@ -110,7 +110,7 @@ async function registerTokenCountNode(nodeType, nodeData) {
     const originalOnNodeCreated = nodeType.prototype.onNodeCreated;
     nodeType.prototype.onNodeCreated = function () {
         originalOnNodeCreated?.apply(this, arguments); // call original method, then custom stuff
-        startCounting(this, cfg.widget, cfg.tok_types);
+        startCounting(this, nodeWidgetMappingConfig.widget, nodeWidgetMappingConfig.tok_types);
     };
 }
 

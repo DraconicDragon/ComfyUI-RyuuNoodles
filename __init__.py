@@ -32,7 +32,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FloatPlain": "Float 🐲",
     "Ryuu_FloatPlainLarger": "Float L 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
-    "Ryuu_TokenCountTextBox": "Token Counter Textbox (CLIP-L) 🐲",
+    "Ryuu_TokenCountTextBox": "Textbox 🐲",
 }
 
 WEB_DIRECTORY = "./js"

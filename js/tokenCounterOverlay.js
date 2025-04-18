@@ -62,8 +62,8 @@ function startCounting(node, widgetField, tokTypes) {
             });
             const data = await resp.json();
             // spit out tokTypes as string
-            console.log(`{tokTypes: ${tokTypes.join(", ")}}`);
-            console.log(JSON.stringify(data));
+            // console.log(`{tokTypes: ${tokTypes.join(", ")}}`);
+            // console.log(JSON.stringify(data));
 
             node._tokenCounts = data.token_counts || {};
         } catch (e) {

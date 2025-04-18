@@ -18,12 +18,6 @@ app.registerExtension({
                 "Currently supported tokenizer types: CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW",
             // todo: tooltips and textbox are far too small for this :pensive:
 
-            // onChange: async (newVal) => {
-            //     api.fetchApi("/ryuu/token_count_overlay/update", {
-            //         method: "POST",
-            //         body: JSON.stringify({ apikey: newVal }),
-            //     });
-            // }
         },
     ],
 });

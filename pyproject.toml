@@ -1,7 +1,7 @@
 [project]
 name = "RyuuNoodles"
 description = "Collection of one or more custom nodes for ComfyUI made mainly for personal use (More info on the GitHub repo README). \nNodes: live Token Counter Textbox, switch nodes with fallback functionality and FLOAT/INT nodes (and maybe more)."
-version = "1.4.1"
+version = "1.4.2"
 license = { file = "LICENSE" }
 dependencies = ["transformers", "aiohttp"]
 
@@ -13,4 +13,4 @@ Repository = "https://github.com/DraconicDragon/ComfyUI-RyuuNoodles"
 [tool.comfy]
 PublisherId = "drac"
 DisplayName = "ComfyUI-RyuuNoodles"
-Icon = "https://raw.githubusercontent.com/DraconicDragon/ComfyUI-RyuuNoodles/refs/heads/main/assets/ryuunoodles_edited_icon.webp"
+Icon = "https://raw.githubusercontent.com/DraconicDragon/ComfyUI-RyuuNoodles/refs/heads/main/assets/RyuuNoodles_Icon_L.webp"

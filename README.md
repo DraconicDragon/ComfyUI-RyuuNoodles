@@ -37,7 +37,7 @@ This adds the CLIP-L and T5🚀 (🚀= Fast) token counters ontop of the RyuuNoo
 
 **Regarding the "fast" versions of the T5 tokenizer:** It's faster as far as I could tell, otherwise i don't know much about it. There is one for CLIP too but it was slower for me so i didnt include it</details>
 
-<details><summary>The workings</summary>Too lazy to add detailed information here but the code to display it on the node is in [tokenCounterOverlay.js](/js/tokenCounterOverlay.js) using mainly `nodeType.prototype.onDrawForeground` and the code that turns text into tokens is in [update_token_count.py](/pyserver/update_token_count.py)
+<details><summary>The workings</summary>Too lazy to add detailed information here but the code to display it on the node is in tokenCounterOverlay.js using mainly nodeType.prototype.onDrawForeground and the code that turns text into tokens is in update_token_count.py
 
 There is a minimal standalone version/script for CLIP-L here: <https://gist.github.com/DraconicDragon/10ac26d0d11ea9b14a0edae5d728bc96></details>
 

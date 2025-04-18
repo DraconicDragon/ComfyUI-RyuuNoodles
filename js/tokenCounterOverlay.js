@@ -1,7 +1,8 @@
 import { api } from "../../scripts/api.js";
 import { app } from "../../scripts/app.js";
 
-// todo: can probably change to not require reload
+// todo: can probably change to not require reload, let
+let addSpecialTokens = app.extensionManager.setting.get("RyuuNoodles.TokenizerAddSpecialTokens") || false;
 const rawSettingsString = (app.extensionManager.setting.get("RyuuNoodles.TokenCountOverlay") || "");
 // strip all whitespace
 const clean = rawSettingsString.replace(/(?<=\.[^:;]+)\s+/g, "");
@@ -52,12 +53,14 @@ function startCounting(node, widgetField, tokTypes) {
         node._lastText = inputText;
 
         try {
+            addSpecialTokens = app.extensionManager.setting.get("RyuuNoodles.TokenizerAddSpecialTokens");
             const resp = await api.fetchApi("/ryuu/update_token_count", { // todo: update endpoint to /ryuu/token_counter/update?
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     text: inputText,
                     tok_types: tokTypes,
+                    add_special_tokens: addSpecialTokens,
                 }),
             });
             const data = await resp.json();

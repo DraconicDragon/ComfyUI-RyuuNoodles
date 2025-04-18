@@ -58,6 +58,8 @@ async def update_token_count(request):
     if not text:
         return web.json_response({"error": "No text provided"}, status=400)
 
+    add_special_tokens = data.get("add_special_tokens", False)
+    
     token_counts = {}
     tokens_map = {}
 
@@ -71,7 +73,7 @@ async def update_token_count(request):
             continue
 
         # run the tokenizer
-        outputs = tokenizer(text, return_tensors="pt", add_special_tokens=False)
+        outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
         num = outputs["input_ids"].shape[1]
 
         token_counts[name] = num

@@ -2,8 +2,8 @@ import { api } from "../../scripts/api.js";
 import { app } from "../../scripts/app.js";
 
 // todo: can probably change to not require reload, let
-let addSpecialTokens = app.extensionManager.setting.get("RyuuNoodles.TokenizerAddSpecialTokens") || false;
-const rawSettingsString = (app.extensionManager.setting.get("RyuuNoodles.TokenCountOverlay") || "");
+let addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
+const rawSettingsString = (app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "");
 // strip all whitespace
 const clean = rawSettingsString.replace(/(?<=\.[^:;]+)\s+/g, "");
 const nodeWidgetMapping = {};

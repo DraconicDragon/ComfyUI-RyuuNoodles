@@ -4,7 +4,7 @@ import { app } from "../../scripts/app.js";
 // todo: can probably change to not require reload
 const rawSettingsString = (app.extensionManager.setting.get("RyuuNoodles.TokenCountOverlay") || "");
 // strip all whitespace
-const clean = rawSettingsString.replace(/\s/g, "");
+const clean = rawSettingsString.replace(/(?<=\.[^:;]+)\s+/g, "");
 const nodeWidgetMapping = {};
 
 clean.split(";")

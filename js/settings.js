@@ -29,7 +29,7 @@ app.registerExtension({
                 step: 25,
             },
             defaultValue: 1000,
-            tooltip: "Default: 1000\nSuggested to stay above 300ms.",
+            tooltip: "Default: 1000\nSuggested to stay above 200ms.",
             onChange: (newVal, oldVal) => {
                 console.log(`RyuuSettings.TokenizerAddSpecialTokens.UpdateInterval has been changed from ${oldVal} to ${newVal}`);
             },

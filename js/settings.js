@@ -3,6 +3,21 @@ import { app } from "../../scripts/app.js";
 app.registerExtension({
     name: "RyuuNoodles.Settings",
     settings: [
+        // NOTE: The order the settings are displayed in the UI is reverse from how they show up in code
+        {
+            id: "RyuuSettings.TokenizerAddSpecialTokens",
+            category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Tokenizer special tokens'],
+            name: "Include special tokens",
+            type: "boolean",
+            defaultValue: false,
+            tooltip: "This will add the number of special tokens per tokenizer to the token count.\n" +
+                "E.g: If enabled, CLIP-L will always show 2 tokens more because of 'startoftext' and 'endoftext' tokens " +
+                "which are invisible to the user.",
+            onChange: (newVal, oldVal) => {
+                console.log(`RyuuSettings.TokenizerAddSpecialTokens has been changed from ${oldVal} to ${newVal}`);
+            },
+        },
+
         {
             id: "RyuuSettings.TokenCountOverlay", // don't change, use category for name setting
             // ["Category name", "Section heading", "Setting label"], but "Settings label" seems to be overwritten by 'name:'
@@ -17,20 +32,6 @@ app.registerExtension({
                 "Supported tokenizer types: CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW\n" +
                 "Please check the GitHub README for more info",
             // todo: tooltips and textbox are far too small for this :pensive:
-        },
-
-        {
-            id: "RyuuSettings.TokenizerAddSpecialTokens",
-            category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Tokenizer special tokens'],
-            name: "Include special tokens",
-            type: "boolean",
-            defaultValue: false,
-            tooltip: "This will add the number of special tokens per tokenizer to the token count.\n" +
-                "E.g: If enabled, CLIP-L will always show 2 tokens more because of 'startoftext' and 'endoftext' tokens " +
-                "which are invisible to the user.",
-            onChange: (newVal, oldVal) => {
-                console.log(`RyuuSettings.TokenizerAddSpecialTokens has been changed from ${oldVal} to ${newVal}`);
-            },
         },
     ],
 });

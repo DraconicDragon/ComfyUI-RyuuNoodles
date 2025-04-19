@@ -12,3 +12,5 @@
 - Merge branch 'main' of https://github.com/DraconicDragon/ComfyUI-RyuuNoodles
 
 
+
+[View changes on GitHub](https://github.com/DraconicDragon/ComfyUI-RyuuNoodles/compare/v1.5.0...v1.5.1)

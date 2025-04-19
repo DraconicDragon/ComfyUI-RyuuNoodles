@@ -94,3 +94,5 @@ The float nodes round with three decimal places to keep the funny rounding "erro
 - Float Slider and Float are meant for denoise  
 - Float L is meant for CFG  
 - Int Slider is meant for steps
+
+<sub>Use [ComfyUI_NYJY](https://github.com/aidenli/ComfyUI_NYJY) for a float slider but with actual configurable options, i believe [mixlab](https://github.com/shadowcz007/comfyui-mixlab-nodes) also has one.</sub>

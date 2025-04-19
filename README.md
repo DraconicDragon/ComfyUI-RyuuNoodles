@@ -6,11 +6,9 @@
 
 Collection of one or more custom nodes for ComfyUI made mainly for personal use <sub><sub><sub>...rawr...</sub></sub></sub>
 
-### Settings
+To see the settings this pack adds, please see [SETTINGS.md](SETTINGS.md).
 
-Please see [SETTINGS.md](SETTINGS.md)
-
-## Nodes
+## Features/Nodes
 
 ### Live Token Counter on Textboxes
 

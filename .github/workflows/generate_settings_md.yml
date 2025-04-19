@@ -1,0 +1,37 @@
+name: Update SETTINGS.md on settings.js change
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "js/settings.js" # Trigger only when settings.js is modified on main branch
+
+jobs:
+  update-settings:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # Run the settings markdown conversion script
+      - name: Run settings markdown conversion script
+        run: |
+          python3 ./extras/settings_markdown_conv.py
+
+      # Commit the generated SETTINGS.md file (if it's modified)
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add SETTINGS.md
+          git diff --cached --exit-code || (git commit -m 'docs: Update SETTINGS.md' && git push)

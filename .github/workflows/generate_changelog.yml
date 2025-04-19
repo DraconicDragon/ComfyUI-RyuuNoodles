@@ -45,9 +45,9 @@ jobs:
             {
               "template": "#{{CHANGELOG}}",
               "categories": [
-                { "title": "## Feature", "labels": ["feat","feature"] },
-                { "title": "## Fix",     "labels": ["fix","bug"]     },
-                { "title": "## Other",   "labels": []               }
+                { "title": "## Feature", "labels": ["feat", "feature"] },
+                { "title": "## Fix",     "labels": ["fix", "bug"]      },
+                { "title": "## Other",   "labels": []                  }
               ],
               "label_extractor": [
                 {
@@ -70,5 +70,14 @@ jobs:
           git add CHANGELOG.md
           git commit -m "chore: update CHANGELOG.md for ${{ steps.tags.outputs.latest_tag }}"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release with changelog
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tags.outputs.latest_tag }}
+          name: ${{ steps.tags.outputs.latest_tag }}
+          body: ${{ steps.changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

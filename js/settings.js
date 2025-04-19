@@ -44,8 +44,6 @@ app.registerExtension({
             defaultValue: "Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;CLIPTextEncode.text:CLIP_L,T5_FAST;",
             tooltip: "Enter the node names (internal nodeData.name), their widget names and tokenizer types. " +
                 "A token counter will appear above the supplied widget.\n" +
-                //"Format: 'Node_Name.widget_name:Tokenizer1,Tok2,Tok3;Node_Name2.widget_name:Tok1;'.\n" +
-                //"Example: 'Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;'\n" +
                 "Supported tokenizer types: CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW\n" +
                 "Please check the GitHub README for more info",
             // todo: tooltips and textbox are far too small for this :pensive:

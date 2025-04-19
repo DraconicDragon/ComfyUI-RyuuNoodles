@@ -1,6 +1,7 @@
 name: 📝 Generate Changelog
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["📌 Auto Tag from pyproject.toml"]
     types:

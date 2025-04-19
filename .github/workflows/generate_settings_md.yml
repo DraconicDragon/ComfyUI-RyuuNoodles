@@ -26,6 +26,7 @@ jobs:
       # Run the settings markdown conversion script
       - name: Run settings markdown conversion script
         run: |
+          git pull origin main
           python3 ./extras/settings_markdown_conv.py
 
       # Commit the generated SETTINGS.md file (if it's modified)

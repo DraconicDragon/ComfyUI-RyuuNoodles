@@ -1,15 +1,20 @@
-# ComfyUI-RyuuNoodles 🐲
+<p align="center">
+  <img src="/assets/ryuunoodles_edited_icon.webp" alt="Banner"  height="250"/>
+</p>
+
+<h1 align="center">ComfyUI-RyuuNoodles 🐲</h1>
 
 Collection of one or more custom nodes for ComfyUI made mainly for personal use <sub><sub><sub>...rawr...</sub></sub></sub>
 
 ## Live Token Counter on Textboxes
 
-![Live token counter showcase](assets/token_counter_overlay.gif)
+<p>
+  <img src="assets/token_counter_overlay.gif" alt="Live token counter showcase" width="700"/>
+</p>
 
 Yeeeeeee.
 
 No CLIP input required. With this repo/custom nodes you'll have the ability to add a token counter with variable tokenizers to any node/widget you desire (preferably a multiline text widget but you do you lol).
-
 This is done by going to the "RyuuNoodles 🐲" settings page and adding the internal node name and the widget name of that node you want the counter to be on top of.
 
 **The format is:**  

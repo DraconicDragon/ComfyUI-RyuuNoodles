@@ -6,7 +6,13 @@
 
 Collection of one or more custom nodes for ComfyUI made mainly for personal use <sub><sub><sub>...rawr...</sub></sub></sub>
 
-## Live Token Counter on Textboxes
+### Settings
+
+Pleas see [SETTINGS.md](SETTINGS.md)
+
+## Nodes
+
+### Live Token Counter on Textboxes
 
 <p>
   <img src="assets/token_counter_overlay.gif" alt="Live token counter showcase" width="700"/>
@@ -17,7 +23,8 @@ Yeeeeeee.
 No CLIP input required. With this repo/custom nodes you'll have the ability to add a token counter with variable tokenizers to any node/widget you desire (preferably a multiline text widget but you do you lol).
 This is done by going to the "RyuuNoodles 🐲" settings page and adding the internal node name and the widget name of that node you want the counter to be on top of.
 
-**The format is:**  
+#### Format
+
 `Node_Name.widget_name:Tokenizer1,Tok2,Tok3;Node Name 2.widget_name:Tok1;` etc...
 
 - Supported tokenizers: `CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW`
@@ -31,7 +38,8 @@ Right-click a node and select 'Properties Panel'. The value for `Node name for S
 Usually it's simply the placeholder text (or input name on single line text widgets).  
 <sub>(if there's a custom placeholder text... uh good luck, maybe need to read the code of that custom node in that case)</sub>
 
-**Example** (also default value):  
+##### Example (also default value)
+
 `Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;CLIPTextEncode.text:CLIP_L,T5_FAST;`  
 This adds the CLIP-L and T5🚀 (🚀= Fast) token counters ontop of the RyuuNoodles Textbox and the Comfy Core Clip Text Encode (Prompt) node.  
 <sub>Also: The Text Multiline node from WAS node suite shown in the gif above has the node name `Text Multiline`</sub>
@@ -58,7 +66,7 @@ There is a minimal standalone version/script for CLIP-L here:
 <https://gist.github.com/DraconicDragon/10ac26d0d11ea9b14a0edae5d728bc96>
 </details>
 
-## Switches with Fallback
+### Switches with Fallback
 
 Yes, there are already quite a few switch custom nodes. However I couldn't find any that would accept an/the second input being empty/None due to the connected node being bypassed or muted so I made these.  
 The Switch Any Fallback node is probably the best choice here  
@@ -76,13 +84,13 @@ I briefly had the idea of allowing the user to add more switch nodes through a y
 A solution to still have a similar kind of thing is making a switch node that would allow a dynamic amount of inputs that increases using an option on the node or increases by 1 as inputs are being populated, however ComfyUI frontend updates are moving fast any changing how inputs work, and it seems like it breaks things like this (as can be seen on the Impact Pack Switch (Any) node as of writing, it doesn't create new inputs anymore) so I'm holding off working on that
 </details>
 
-### Passthrough node
+#### Passthrough node
 
 ![Passthrough node showcase](assets/passthrough.png)
 
 Has the same functionality as the switch nodes, just without the boolean switch.
 
-## Numbers/Sliders
+### Numbers/Sliders
 
 ![numbers and sliders nodes showcase](assets/numbers_and_sliders.gif)
 

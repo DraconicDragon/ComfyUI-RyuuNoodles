@@ -8,7 +8,7 @@ Collection of one or more custom nodes for ComfyUI made mainly for personal use 
 
 ### Settings
 
-Pleas see [SETTINGS.md](SETTINGS.md)
+Please see [SETTINGS.md](SETTINGS.md)
 
 ## Nodes
 
@@ -38,7 +38,7 @@ Right-click a node and select 'Properties Panel'. The value for `Node name for S
 Usually it's simply the placeholder text (or input name on single line text widgets).  
 <sub>(if there's a custom placeholder text... uh good luck, maybe need to read the code of that custom node in that case)</sub>
 
-##### Example (also default value)
+#### Example (also default value)
 
 `Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;CLIPTextEncode.text:CLIP_L,T5_FAST;`  
 This adds the CLIP-L and T5🚀 (🚀= Fast) token counters ontop of the RyuuNoodles Textbox and the Comfy Core Clip Text Encode (Prompt) node.  

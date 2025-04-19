@@ -1,0 +1,47 @@
+name: 📌 Auto Tag from pyproject.toml
+
+on:
+  push:
+    paths:
+      - "pyproject.toml" # runs on every branch
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to push tags
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: get_version
+        run: |
+          # grab version="X.Y.Z(-suffix)" from pyproject.toml
+          version=$(grep -E '^version *= *' pyproject.toml \
+                 | sed -E 's/version *= *"([^"]+)"/\1/')
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Check for existing tag
+        id: check_tag
+        run: |
+          tag="v${{ steps.get_version.outputs.version }}"
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create & push tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          tag="v${{ steps.get_version.outputs.version }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$tag"
+          git push origin "$tag"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

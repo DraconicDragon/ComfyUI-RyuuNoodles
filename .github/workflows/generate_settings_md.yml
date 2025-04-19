@@ -1,4 +1,4 @@
-name: Update SETTINGS.md on settings.js change
+name: Update SETTINGS.md
 
 on:
   workflow_dispatch:

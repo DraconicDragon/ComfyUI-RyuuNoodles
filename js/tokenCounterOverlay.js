@@ -1,29 +1,29 @@
 import { api } from "../../scripts/api.js";
 import { app } from "../../scripts/app.js";
 
-// todo: can probably change to not require reload, let
-let addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
-const rawSettingsString = (app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "");
-// strip all whitespace
-const clean = rawSettingsString.replace(/(?<=\.[^:;]+)\s+/g, "");
-const nodeWidgetMapping = {};
+// Parse the raw semicolon‑delimited setting string into a JS map:
+// { nodeName: { widget, tok_types: [...] } }
+function parseSettingsString(raw) {
+    const clean = (raw || "").replace(/(?<=\.[^:;]+)\s+/g, ""); // strip whitespace
+    const nodeWidgetMapping = {};
 
-clean.split(";")
-    .filter(Boolean)
-    .forEach(entry => {
-        const [nodeWidget, tokList] = entry.split(":");
-        if (!nodeWidget || !tokList) return;
-        const [nodeName, widgetName] = nodeWidget.split(".");
-        if (!nodeName || !widgetName) return;
-
-        nodeWidgetMapping[nodeName] = {
-            widget: widgetName,
-            tok_types: tokList
-                .split(",")
-                .map(t => t.toLowerCase())
-                .filter(Boolean)
-        };
-    });
+    clean.split(";")
+        .filter(Boolean)
+        .forEach(entry => {
+            const [nodeWidget, tokList] = entry.split(":");
+            if (!nodeWidget || !tokList) return;
+            const [nodeName, widgetName] = nodeWidget.split(".");
+            if (!nodeName || !widgetName) return;
+            nodeWidgetMapping[nodeName] = {
+                widget: widgetName,
+                tok_types: tokList
+                    .split(",")
+                    .map(t => t.toLowerCase())
+                    .filter(Boolean)
+            };
+        });
+    return nodeWidgetMapping;
+}
 
 // helper to turn e.g. "clip_l" → "Clip L", "t5_fast" → "T5🚀"
 function prettifyTokenizerName(tok) {
@@ -36,56 +36,71 @@ function prettifyTokenizerName(tok) {
     return hasFast ? `${title}🚀` : title;
 }
 
-/**
- * Function to start counting tokens in the specified node's widget
- * @param  node - The node object
- * @param {String} widgetField - The name of the widget (usually input name defined in python) to monitor for text changes
- */
-function startCounting(node, widgetField, tokTypes) {
+// Function to start counting tokens in the specified node's widget
+function startCounting(node) {
     node._lastText = "";
-    node._tokenCounts = {}; // will become { clip_l: 42, t5_fast: 56, … }
+    node._tokenCounts = {};
 
-    setInterval(async () => {
-        const w = node.widgets.find(w => w.name === widgetField);
-        const inputText = (w?.value ?? "") + ""; // fallback to empty string, ensure it's a string
+    // using a recursive timeout to be able to adjust delay every tick
+    async function tick() {
+        // read settings dynamically
+        const updateInterval = 1000;
+        const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
+        const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
+        const mapping = parseSettingsString(rawSettingsString);
+        const mapConfig = mapping[node._mapConfigName];
+        if (!mapConfig) return;
 
-        if (inputText === node._lastText) return;
-        node._lastText = inputText;
+        // find the widget each tick in case they renamed it
+        const w = node.widgets.find(w => w.name === mapConfig.widget);
+        const inputText = (w?.value ?? "") + "";
 
-        try {
-            addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens");
-            const resp = await api.fetchApi("/ryuu/update_token_count", { // todo: update endpoint to /ryuu/token_counter/update?
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    text: inputText,
-                    tok_types: tokTypes,
-                    add_special_tokens: addSpecialTokens,
-                }),
-            });
-            const data = await resp.json();
-            // spit out tokTypes as string
-            // console.log(`{tokTypes: ${tokTypes.join(", ")}}`);
-            // console.log(JSON.stringify(data));
+        // skip if unchanged
+        if (inputText !== node._lastText) {
+            node._lastText = inputText;
+            try {
+                const resp = await api.fetchApi("/ryuu/update_token_count", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: inputText,
+                        tok_types: mapConfig.tok_types,
+                        add_special_tokens: addSpecialTokens,
+                    }),
+                });
 
-            node._tokenCounts = data.token_counts || {};
-        } catch (e) {
-            console.error("Token count API error:", e);
+                const data = await resp.json();
+                node._tokenCounts = data.token_counts || {};
+
+            } catch (e) {
+                console.error("Token count error:", e);
+            }
+            node.setDirtyCanvas(true);
         }
 
-        node.setDirtyCanvas(true); // mark as dirty so redraw happens
-    }, 1000); // in milliseconds
+        // schedule next tick with a possibly new interval
+        setTimeout(tick, updateInterval);
+    }
+
+    // start the function off
+    tick();
 }
 
 
 async function registerTokenCountNode(nodeType, nodeData) {
-    const nodeWidgetMappingConfig = nodeWidgetMapping[nodeData.name];
-    if (!nodeWidgetMappingConfig) return;
+    // remember node name in each instance
+    const theNodeName = nodeData.name;
 
     // preserve original onDrawForeground
     const originalOnDrawFG = nodeType.prototype.onDrawForeground;
     nodeType.prototype.onDrawForeground = function (ctx) {
         originalOnDrawFG?.apply(this, arguments); // call original method, then custom stuff
+
+        // re‑parse settings so widget renames or tok_types changes apply immediately
+        const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
+        const mapping = parseSettingsString(rawSettingsString);
+        const nodeWidgetMappingConfig = mapping[theNodeName];
+        if (!nodeWidgetMappingConfig) return;
 
         // find widget & its actual y‑pos (set by LiteGraph)
         const widget = this.widgets.find(w => w.name === nodeWidgetMappingConfig.widget);
@@ -113,7 +128,8 @@ async function registerTokenCountNode(nodeType, nodeData) {
     const originalOnNodeCreated = nodeType.prototype.onNodeCreated;
     nodeType.prototype.onNodeCreated = function () {
         originalOnNodeCreated?.apply(this, arguments); // call original method, then custom stuff
-        startCounting(this, nodeWidgetMappingConfig.widget, nodeWidgetMappingConfig.tok_types);
+        this._mapConfigName = theNodeName;
+        startCounting(this);
     };
 }
 

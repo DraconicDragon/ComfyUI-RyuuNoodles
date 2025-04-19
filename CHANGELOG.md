@@ -1,7 +1,10 @@
-## Other
+## Fix
 
 - fix: i have 0 clue
 - fix: tags not being found in GH actions workflow
+
+## Other
+
 - gh-actions: add on workflow_dispatch
 - chore: update CHANGELOG.md for v1.5.0
 - chore: update readme

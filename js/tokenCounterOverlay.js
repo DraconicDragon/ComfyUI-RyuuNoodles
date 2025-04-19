@@ -44,9 +44,9 @@ function startCounting(node) {
     // using a recursive timeout to be able to adjust delay every tick
     async function tick() {
         // read settings dynamically
-        const updateInterval = 1000;
-        const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
         const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
+        const updateInterval = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.UpdateInterval") || 1000;ore
+        const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false; 
         const mapping = parseSettingsString(rawSettingsString);
         const mapConfig = mapping[node._mapConfigName];
         if (!mapConfig) return;

@@ -19,6 +19,23 @@ app.registerExtension({
         },
 
         {
+            id: "RyuuSettings.TokenCountOverlay.UpdateInterval",
+            category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Update Interval'],
+            name: "Update Interval in ms",
+            type: "slider",
+            attrs: {
+                min: 100,
+                max: 10000,
+                step: 25,
+            },
+            defaultValue: 1000,
+            tooltip: "Default: 1000\nSuggested to stay above 300ms.",
+            onChange: (newVal, oldVal) => {
+                console.log(`RyuuSettings.TokenizerAddSpecialTokens.UpdateInterval has been changed from ${oldVal} to ${newVal}`);
+            },
+        },
+
+        {
             id: "RyuuSettings.TokenCountOverlay", // don't change, use category for name setting
             // ["Category name", "Section heading", "Setting label"], but "Settings label" seems to be overwritten by 'name:'
             category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Nodes'],

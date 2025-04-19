@@ -39,7 +39,7 @@ app.registerExtension({
             id: "RyuuSettings.TokenCountOverlay", // don't change, use category for name setting
             // ["Category name", "Section heading", "Setting label"], but "Settings label" seems to be overwritten by 'name:'
             category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Nodes'],
-            name: "Nodes configuration (Reload required on change)",
+            name: "Nodes configuration",
             type: "text",
             defaultValue: "Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;CLIPTextEncode.text:CLIP_L,T5_FAST;",
             tooltip: "Enter the node names (internal nodeData.name), their widget names and tokenizer types. " +

@@ -60,8 +60,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Save changelog to file
-        run: echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
+      - name: Append compare URL and save changelog to file
+        run: |
+          echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "[View changes on GitHub](https://github.com/${{ github.repository }}/compare/${{ steps.tags.outputs.previous_tag }}...${{ steps.tags.outputs.latest_tag }})" >> CHANGELOG.md
 
       - name: Commit changelog
         run: |
@@ -78,6 +81,9 @@ jobs:
         with:
           tag_name: ${{ steps.tags.outputs.latest_tag }}
           name: ${{ steps.tags.outputs.latest_tag }}
-          body: ${{ steps.changelog.outputs.changelog }}
+          body: |
+            ${{ steps.changelog.outputs.changelog }}
+
+            [View changes on GitHub](https://github.com/${{ github.repository }}/compare/${{ steps.tags.outputs.previous_tag }}...${{ steps.tags.outputs.latest_tag }})
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

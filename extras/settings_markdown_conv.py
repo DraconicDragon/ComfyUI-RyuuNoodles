@@ -95,7 +95,7 @@ def write_markdown(settings, out_file: Path):
             "from [/js/settings.js](/js/settings.js) using [generate_settings_md.yml](/.github/workflows/generate_settings_md.yml).\n"
             "You can find the settings the custom node pack adds here as well as the defaults and tooltips.\n\n"
         )
-        for s in settings:
+        for s in reversed(settings):  # reversed here to match visual settings page
             cats = s["category"]
             # build header: ignore first & last category, use middle + name
             if len(cats) >= 3:

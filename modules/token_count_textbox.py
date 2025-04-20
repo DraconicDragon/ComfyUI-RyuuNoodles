@@ -7,7 +7,7 @@ class TokenCountTextBox:
             }
         }
 
-    CATEGORY = "RyuuNoodles/Util"
+    CATEGORY = "RyuuNoodles/Text"
 
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)

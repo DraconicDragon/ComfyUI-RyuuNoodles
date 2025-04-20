@@ -56,7 +56,7 @@ class CleanStringAdvanced:
             },
         }
 
-    CATEGORY = "RyuuNoodles/Util"
+    CATEGORY = "RyuuNoodles/Text"
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
     FUNCTION = "clean_text"

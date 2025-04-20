@@ -64,7 +64,7 @@ jobs:
         run: |
           echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "[View changes on GitHub](https://github.com/${{ github.repository }}/compare/${{ steps.tags.outputs.previous_tag }}...${{ steps.tags.outputs.latest_tag }})" >> CHANGELOG.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.tags.outputs.previous_tag }}...${{ steps.tags.outputs.latest_tag }}" >> CHANGELOG.md
 
       # - name: Commit changelog
       #   run: |

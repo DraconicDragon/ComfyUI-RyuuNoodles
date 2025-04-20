@@ -9,17 +9,21 @@ class CleanStringAdvanced:
                 ),
             },
             "optional": {
-                "strip_left": (
-                    "BOOLEAN",
-                    {"default": True, "tooltip": "Remove whitespace at the beginning of each line."},
+                "strip": (
+                    "COMBO",
+                    {
+                        "default": "both",
+                        "choices": ["off", "left", "right", "both"],
+                        "tooltip": "Control which side(s) of whitespace to strip from each line.",
+                    },
                 ),
-                "strip_right": (
-                    "BOOLEAN",
-                    {"default": True, "tooltip": "Remove whitespace at the end of each line."},
-                ),
-                "remove_trailing_comma": (
-                    "BOOLEAN",
-                    {"default": True, "tooltip": "Remove a comma if it appears at the end of a line."},
+                "trailing_comma": (
+                    "COMBO",
+                    {
+                        "default": "remove",
+                        "choices": ["off", "remove", "add", "add + space"],
+                        "tooltip": "Remove or add a comma at the end of each line.",
+                    },
                 ),
                 "collapse_spaces": (
                     "BOOLEAN",
@@ -47,8 +51,8 @@ class CleanStringAdvanced:
 
     DESCRIPTION = (
         "Cleans up and formats the given text with a set of optional filters:\n"
-        "- Strip left/right whitespace\n"
-        "- Remove trailing comma\n"
+        "- Strip whitespace (off/left/right/both)\n"
+        "- Remove or add trailing comma\n"
         "- Collapse multiple spaces\n"
         "- Convert to lowercase\n"
         "- Collapse lines into one\n"
@@ -60,25 +64,27 @@ class CleanStringAdvanced:
     def clean_text(
         self,
         input_text,
-        strip_left=True,
-        strip_right=True,
-        remove_trailing_comma=True,
-        collapse_spaces=True,
-        to_lowercase=False,
-        collapse_lines=False,
-        preserve_empty_lines=True,
+        strip,
+        trailing_comma,
+        collapse_spaces,
+        to_lowercase,
+        collapse_lines,
+        preserve_empty_lines,
     ):
         lines = input_text.splitlines()
-
         cleaned_lines = []
+
         for line in lines:
-            original_line = line
-            if strip_left:
+            if strip in ("left", "both"):
                 line = line.lstrip()
-            if strip_right:
+            if strip in ("right", "both"):
                 line = line.rstrip()
-            if remove_trailing_comma and line.endswith(","):
+
+            if trailing_comma == "remove" and line.endswith(","):
                 line = line[:-1]
+            elif trailing_comma == "add" and not line.endswith(",") and line:
+                line = line + ","
+
             if collapse_spaces:
                 line = " ".join(line.split())
 

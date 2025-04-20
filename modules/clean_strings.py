@@ -1,3 +1,6 @@
+import re
+
+
 class CleanStringAdvanced:
     @classmethod
     def INPUT_TYPES(cls):
@@ -11,34 +14,44 @@ class CleanStringAdvanced:
                     ["off", "left", "right", "both"],
                     {
                         "default": "both",
-                        "tooltip": "Control which side(s) of whitespace to strip from each line.",
+                        "tooltip": "Control which side(s) of whitespace to strip from the input string.",
                     },
                 ),
                 "trailing_comma": (
                     ["off", "remove", "add", "add + space"],
                     {
                         "default": "remove",
-                        "tooltip": "Remove or add a comma at the end of each line.",
+                        "tooltip": (
+                            "Remove or add a comma at the end of the input string."
+                            "Will not add a comma if one already exists,"
+                            "but will add a space if 'add + space' is chosen and a comma exists but no space."
+                        ),
+                    },
+                ),
+                "newlines": (
+                    ["off", "remove empty", "collapse lines"],
+                    {
+                        "default": "off",
+                        "tooltip": (
+                            "Control how newlines are handled:\n"
+                            "off = keep all lines\n"
+                            "remove empty = drop blank lines\n"
+                            "collapse lines = join all lines into one"
+                        ),
                     },
                 ),
                 "collapse_spaces": (
                     "BOOLEAN",
-                    {"default": True, "tooltip": "Replace multiple spaces in a line with a single space."},
+                    {
+                        "default": True,
+                        "tooltip": "Replace multiple subsequently appearing spaces in the input string with a single space.",
+                    },
                 ),
                 "to_lowercase": (
                     "BOOLEAN",
                     {"default": False, "tooltip": "Convert all characters in the string to lowercase."},
                 ),
-                "collapse_lines": (
-                    "BOOLEAN",
-                    {"default": False, "tooltip": "Join all lines into a single line with spaces between them."},
-                ),
-                "preserve_empty_lines": (
-                    "BOOLEAN",
-                    {"default": True, "tooltip": "Keep empty lines in the final output."},
-                ),
             },
-            # "optional": {},
         }
 
     CATEGORY = "RyuuNoodles/Util"
@@ -48,14 +61,13 @@ class CleanStringAdvanced:
 
     DESCRIPTION = (
         "Cleans up and formats the given text with a set of optional filters:\n"
-        "- Strip whitespace (off/left/right/both)\n"
-        "- Remove or add trailing comma\n"
-        "- Collapse multiple spaces\n"
+        "- Strip whitespace (off/left/right/both) from the input string\n"
+        "- Remove or add trailing comma from the input string\n"
+        "- Collapse multiple spaces in the input string\n"
         "- Convert to lowercase\n"
-        "- Collapse lines into one\n"
-        "- Optionally preserve empty lines\n\n"
-        "Useful for normalizing input strings for consistent processing.\n"
-        "Token counters will reflect the cleaned result."
+        "- Control newline handling (off/remove empty/collapse lines)\n"
+        "\n"
+        "Useful for normalizing input strings for consistent processing."
     )
 
     def clean_text(
@@ -65,35 +77,49 @@ class CleanStringAdvanced:
         trailing_comma,
         collapse_spaces,
         to_lowercase,
-        collapse_lines,
-        preserve_empty_lines,
+        newlines,
     ):
+        # lowercase convert first
+        if to_lowercase:
+            input_text = input_text.lower()
+
+        # Split into lines for newline handling
         lines = input_text.splitlines()
-        cleaned_lines = []
 
-        for line in lines:
-            if strip in ("left", "both"):
-                line = line.lstrip()
-            if strip in ("right", "both"):
-                line = line.rstrip()
-
-            if trailing_comma == "remove" and line.endswith(","):
-                line = line[:-1]
-            elif trailing_comma == "add" and not line.endswith(",") and line:
-                line = line + ","
-
-            if collapse_spaces:
-                line = " ".join(line.split())
-
-            if to_lowercase:
-                line = line.lower()
-
-            if preserve_empty_lines or line:
-                cleaned_lines.append(line)
-
-        if collapse_lines:
-            cleaned = " ".join(cleaned_lines)
+        # Filter or collapse lines based on newlines setting
+        if newlines == "remove empty":
+            # Drop blank lines
+            processed_lines = [line for line in lines if line.strip()]
         else:
-            cleaned = "\n".join(cleaned_lines)
+            processed_lines = lines.copy()
+
+        # Join lines if collapsing
+        if newlines == "collapse lines":
+            cleaned = " ".join(processed_lines)
+        else:
+            cleaned = "\n".join(processed_lines)
+
+        # Collapse spaces only (ignore newlines)
+        if collapse_spaces:
+            # Replace multiple spaces with a single space
+            cleaned = re.sub(r" {2,}", " ", cleaned)
+
+        # Strip whitespace from ends
+        if strip in ("left", "both"):
+            cleaned = cleaned.lstrip()
+        if strip in ("right", "both"):
+            cleaned = cleaned.rstrip()
+
+        # Apply trailing comma logic
+        cleaned = cleaned.rstrip()  # Remove whitespace before comma operations
+        if trailing_comma == "remove" and cleaned.endswith(","):
+            cleaned = cleaned.rstrip(",")
+        elif trailing_comma == "add" and cleaned and not cleaned.endswith(","):
+            cleaned = cleaned + ","
+        elif trailing_comma == "add + space" and cleaned:
+            if cleaned.endswith(","):
+                cleaned = cleaned + " "  # Add a space if it already ends with a comma
+            elif not cleaned.endswith(", "):
+                cleaned = cleaned + ", "  # Add a comma and a space if it doesn't end with ", "
 
         return (cleaned,)

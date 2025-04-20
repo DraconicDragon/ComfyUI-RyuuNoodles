@@ -1,3 +1,4 @@
+from .modules.clean_strings import CleanStringAdvanced
 from .modules.fallback_passthrough import FallbackPassthrough
 from .modules.fallback_switches import (
     FallbackSwitchAny,
@@ -6,9 +7,13 @@ from .modules.fallback_switches import (
 )
 from .modules.number_ops import FloatPlain, FloatPlainLarger, FloatSlider, IntSlider
 from .modules.token_count_textbox import TokenCountTextBox
+
+# to get the routes registered
 from .pyserver import update_token_count
 
 NODE_CLASS_MAPPINGS = {
+    # String cleaning/stripping nodes
+    "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
     # Switches and Passthrough nodes
     "Ryuu_FallbackPassthrough": FallbackPassthrough,
     "Ryuu_FallbackSwitchAny": FallbackSwitchAny,
@@ -24,6 +29,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
+    "Ryuu_CleanStringAdvanced": "Clean String Advanced 🐲",
     "Ryuu_FallbackSwitchAny": "Switch Any Fallback 🐲",
     "Ryuu_FallbackSwitchImage": "Switch Image Fallback 🐲",
     "Ryuu_FallbackSwitchLatent": "Switch Latent Fallback 🐲",

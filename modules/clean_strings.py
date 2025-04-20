@@ -40,11 +40,11 @@ class CleanStringAdvanced:
                         ),
                     },
                 ),
-                "collapse_spaces": (
-                    "BOOLEAN",
+                "collapse": (
+                    ["off", "spaces", "spaces + commas"],
                     {
-                        "default": True,
-                        "tooltip": "Replace multiple subsequently appearing spaces in the input string with a single space.",
+                        "default": "spaces + commas",
+                        "tooltip": "Replace multiple subsequently appearing spaces or in combination with commas in the input string with a single occurance of what's being removed.",
                     },
                 ),
                 "to_lowercase": (
@@ -70,12 +70,32 @@ class CleanStringAdvanced:
         "Useful for normalizing input strings for consistent processing."
     )
 
+    def collapse_spaces_comma(self, collapse_commas: bool, text: str) -> str:
+        # Collapse multiple spaces into one (ignoring newlines)
+        if not collapse_commas:
+            cleaned = re.sub(r"[ ]{2,}", " ", text)
+        elif collapse_commas:
+            # 1) Collapse multiple spaces/tabs (but NOT newlines) into a single space
+            cleaned = re.sub(r"[ \t]{2,}", " ", text)
+
+            # 2) Normalize comma spacing within lines
+            #    Remove spaces/tabs around commas, then ensure one space after each comma
+            cleaned = re.sub(r"[ \t]*,[ \t]*", ", ", cleaned)
+
+            # 3) Collapse repeated comma+space sequences into a single ", "
+            cleaned = re.sub(r"(,\s*){2,}", ", ", cleaned)
+
+            # Optional: tidy up trailing spaces on each line (without affecting actual line breaks)
+            cleaned = re.sub(r"[ \t]+(\r?\n)", r"\1", cleaned)
+
+        return cleaned
+
     def clean_text(
         self,
         input_text,
         strip,
         trailing_comma,
-        collapse_spaces,
+        collapse,
         to_lowercase,
         newlines,
     ):
@@ -99,27 +119,29 @@ class CleanStringAdvanced:
         else:
             cleaned = "\n".join(processed_lines)
 
-        # Collapse spaces only (ignore newlines)
-        if collapse_spaces:
-            # Replace multiple spaces with a single space
-            cleaned = re.sub(r" {2,}", " ", cleaned)
+        if collapse == "spaces" or collapse == "spaces + commas":
+            if collapse == "spaces + commas":
+                cleaned = self.collapse_spaces_comma(True, cleaned)
+            else:
+                cleaned = self.collapse_spaces_comma(False, cleaned)
 
-        # Strip whitespace from ends
+        # Strip leading/trailing whitespace
         if strip in ("left", "both"):
             cleaned = cleaned.lstrip()
         if strip in ("right", "both"):
             cleaned = cleaned.rstrip()
 
-        # Apply trailing comma logic
-        cleaned = cleaned.rstrip()  # Remove whitespace before comma operations
-        if trailing_comma == "remove" and cleaned.endswith(","):
-            cleaned = cleaned.rstrip(",")
-        elif trailing_comma == "add" and cleaned and not cleaned.endswith(","):
-            cleaned = cleaned + ","
-        elif trailing_comma == "add + space" and cleaned:
+        # Remove unnecessary trailing comma (and space after it)
+        if trailing_comma == "remove":
+            cleaned = re.sub(r"(?:[ \t]*,[ \t]*)+$", "", cleaned)
+        elif trailing_comma == "add":
+            if cleaned and not re.search(r",[ \t]*$", cleaned):
+                cleaned += ","
+        elif trailing_comma == "add + space":
             if cleaned.endswith(","):
-                cleaned = cleaned + " "  # Add a space if it already ends with a comma
-            elif not cleaned.endswith(", "):
-                cleaned = cleaned + ", "  # Add a comma and a space if it doesn't end with ", "
+                if not cleaned.endswith(", "):
+                    cleaned += " "
+            elif not re.search(r",[ \t]*$", cleaned):
+                cleaned += ", "
 
         return (cleaned,)

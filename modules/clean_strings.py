@@ -1,5 +1,7 @@
 import re
 
+# todo: second textbox that updates on input_text change to work with token counter maybe?
+
 
 class CleanStringAdvanced:
     @classmethod
@@ -17,7 +19,7 @@ class CleanStringAdvanced:
                         "tooltip": "Control which side(s) of whitespace to strip from the input string.",
                     },
                 ),
-                "trailing_comma": (
+                "trailing_commas": (
                     ["off", "remove", "add", "add + space"],
                     {
                         "default": "remove",
@@ -94,7 +96,7 @@ class CleanStringAdvanced:
         self,
         input_text,
         strip,
-        trailing_comma,
+        trailing_commas,
         collapse,
         to_lowercase,
         newlines,
@@ -132,12 +134,12 @@ class CleanStringAdvanced:
             cleaned = cleaned.rstrip()
 
         # Remove unnecessary trailing comma (and space after it)
-        if trailing_comma == "remove":
+        if trailing_commas == "remove":
             cleaned = re.sub(r"(?:[ \t]*,[ \t]*)+$", "", cleaned)
-        elif trailing_comma == "add":
+        elif trailing_commas == "add":
             if cleaned and not re.search(r",[ \t]*$", cleaned):
                 cleaned += ","
-        elif trailing_comma == "add + space":
+        elif trailing_commas == "add + space":
             if cleaned.endswith(","):
                 if not cleaned.endswith(", "):
                     cleaned += " "

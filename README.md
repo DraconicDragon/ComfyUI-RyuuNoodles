@@ -6,6 +6,8 @@
 
 Collection of one or more custom nodes for ComfyUI made mainly for personal use <sub><sub><sub>...rawr...</sub></sub></sub>
 
+ComfyUI Registry: https://registry.comfy.org/nodes/RyuuNoodles
+
 To see the settings this pack adds, please see [SETTINGS.md](SETTINGS.md).
 
 ## Features/Nodes

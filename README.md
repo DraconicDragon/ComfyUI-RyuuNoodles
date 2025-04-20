@@ -90,6 +90,45 @@ A solution to still have a similar kind of thing is making a switch node that wo
 
 Has the same functionality as the switch nodes, just without the boolean switch.
 
+### Strings/Text
+
+![Clean String Advanced showcase](assets/Clean_String_Advanced.png)
+
+Makes text nice and clean.
+
+<details>
+<summary>Settings</summary>
+
+`strip`:
+
+- Options: `off`, `left`, `right`, `both`  
+- Description: Control which side(s) of whitespace to strip from the input string.
+
+`trailing_commas`:
+
+- Options: `off`, `remove`, `add`, `add + space`  
+- Description: Remove or add a comma at the end of the input string. Will not add a comma if one already exists, but will add a space if `add + space` is chosen and a comma exists but no space.
+
+`newlines`:
+
+- Options: `off`, `remove empty`, `collapse lines`  
+- Description: Control how newlines are handled:  
+  - `off` = keep all lines  
+  - `remove empty` = drop blank lines  
+  - `collapse lines` = join all lines into one
+
+`collapse`:
+
+- Options: `off`, `spaces`, `spaces + commas`  
+- Description: Replace multiple subsequently appearing spaces or in combination with commas in the input string with a single occurrence of what's being removed.
+
+`to_lowercase`:
+
+- Options: `true`, `false`  
+- Description: Convert all characters in the string to lowercase.
+
+</details>
+
 ### Numbers/Sliders
 
 ![numbers and sliders nodes showcase](assets/numbers_and_sliders.gif)
@@ -109,3 +148,9 @@ The float nodes round with three decimal places to keep the funny rounding "erro
 - Int Slider is meant for steps
 
 <sub>Use [ComfyUI_NYJY](https://github.com/aidenli/ComfyUI_NYJY) for a float slider but with actual configurable options, i believe [mixlab](https://github.com/shadowcz007/comfyui-mixlab-nodes) also has one.</sub>
+
+### Todo (maybe)
+
+- [ ] make a wildcard node that works like impact pack's (possibly by using impact pack's class, would only work while the pack is installed) but have wildcard be resolved during typing and not on queuing the workflow; need to look into how to preserve the seed and output string for reproducabilty, might not be possible
+
+- [ ] not really a todo but the token counter pushes up the input/output dot names by a few pixels which is probably caused by the extra 2 i added on pushing the counter display up to not collide with the textbox outline while selected/typing

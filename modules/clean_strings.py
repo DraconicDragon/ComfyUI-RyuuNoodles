@@ -7,21 +7,17 @@ class CleanStringAdvanced:
                     "STRING",
                     {"default": "", "multiline": True, "tooltip": "Text input to be cleaned."},
                 ),
-            },
-            "optional": {
                 "strip": (
-                    "COMBO",
+                    ["off", "left", "right", "both"],
                     {
                         "default": "both",
-                        "choices": ["off", "left", "right", "both"],
                         "tooltip": "Control which side(s) of whitespace to strip from each line.",
                     },
                 ),
                 "trailing_comma": (
-                    "COMBO",
+                    ["off", "remove", "add", "add + space"],
                     {
                         "default": "remove",
-                        "choices": ["off", "remove", "add", "add + space"],
                         "tooltip": "Remove or add a comma at the end of each line.",
                     },
                 ),
@@ -42,6 +38,7 @@ class CleanStringAdvanced:
                     {"default": True, "tooltip": "Keep empty lines in the final output."},
                 ),
             },
+            # "optional": {},
         }
 
     CATEGORY = "RyuuNoodles/Util"

@@ -71,7 +71,6 @@ function startCounting(node) {
 
                 const data = await resp.json();
                 node._tokenCounts = data.token_counts || {};
-
             } catch (e) {
                 console.error("Token count error:", e);
             }

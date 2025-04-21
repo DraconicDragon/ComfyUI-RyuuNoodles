@@ -1,6 +1,9 @@
+import re
+
 from aiohttp import web
-from server import PromptServer # type: ignore
 from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast
+
+from server import PromptServer  # type: ignore
 
 # load once at module load
 
@@ -14,7 +17,6 @@ clip_l_tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14"
 t5_tokenizer = T5Tokenizer.from_pretrained("google/t5-v1_1-xxl")
 
 t5_tokenizer_fast = T5TokenizerFast.from_pretrained("google/t5-v1_1-xxl")  # its faster, but idk otherwise
-# todo: consider using google-t5/t5-small?
 
 # UMT5 XXL, WAN2.1
 umt5_tokenizer = AutoTokenizer.from_pretrained("google/umt5-xxl")
@@ -46,6 +48,57 @@ tok_map = {
 }
 
 
+# Helper function to strip weighting syntax from the text
+# (word), (word:1.2), ((word:1.2):0.5) etc. is handled
+# escaped parentheses like \(word\) becomes (word)
+def strip_weighting(text):
+    # Placeholders for escaped parentheses using Unicode private use area
+    open_paren_placeholder = "\ue000"
+    close_paren_placeholder = "\ue001"
+
+    # Process escape characters and replace escaped parentheses
+    processed_text = []
+    escaped = False
+    for char in text:
+        if escaped:
+            if char == "(":
+                processed_text.append(open_paren_placeholder)
+            elif char == ")":
+                processed_text.append(close_paren_placeholder)
+            else:
+                # Keep the backslash and the char if it wasn't ( or )
+                processed_text.append("\\")
+                processed_text.append(char)
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        else:
+            processed_text.append(char)
+
+    # Handle trailing escape character if any
+    if escaped:
+        processed_text.append("\\")
+
+    text = "".join(processed_text)
+
+    # Regex to find the innermost parentheses (and weight if given)
+    # Matches (content) or (content:weight) where content has no parentheses
+    # Weight format allows for positive/negative numbers, integers, and decimals
+    innermost_pattern = re.compile(r"\(([^()]*?)(?::[-+]?\d*(?:\.\d+)?)?\)")
+
+    # Iteratively replace innermost patterns until no changes occur
+    previous_text = None
+    while text != previous_text:
+        previous_text = text
+        text = innermost_pattern.sub(r"\1", text)  # Replace with content only
+
+    # Replace placeholders back to literal parentheses
+    text = text.replace(open_paren_placeholder, "(")
+    text = text.replace(close_paren_placeholder, ")")
+
+    return text
+
+
 @routes.post("/ryuu/update_token_count")
 async def update_token_count(request):
     try:
@@ -59,7 +112,9 @@ async def update_token_count(request):
         return web.json_response({"error": "No text provided"}, status=400)
 
     add_special_tokens = data.get("add_special_tokens", False)
-    
+
+    text = strip_weighting(text)
+
     token_counts = {}
     tokens_map = {}
 

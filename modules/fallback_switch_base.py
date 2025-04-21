@@ -28,7 +28,7 @@ class FallbackSwitchBase:
         'If you want the same node without the boolean input, use "Passthrough 🐲"'
     )
 
-    CATEGORY = "RyuuNoodles/Switches"
+    CATEGORY = "RyuuNoodles 🐲/Switches"
     OUTPUT_NODE = True
 
     @classmethod

@@ -37,7 +37,7 @@ class FallbackPassthrough:
 
     DESCRIPTION = "This node allows for 2 inputs where input_2_opt is chosen if it's provided and otherwise input_1 is used as fallback."
 
-    CATEGORY = "RyuuNoodles/Switches"
+    CATEGORY = "RyuuNoodles 🐲/Switches"
 
     def do_thing(self, input_1, input_2_opt=None):
         if input_2_opt is not None:

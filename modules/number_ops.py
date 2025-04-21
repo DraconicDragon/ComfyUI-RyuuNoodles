@@ -29,7 +29,7 @@ class NumberNodeBase:
 
     FUNCTION = "run"
     OUTPUT_NODE = True
-    CATEGORY = "RyuuNoodles/Numbers"
+    CATEGORY = "RyuuNoodles 🐲/Numbers"
 
     def run(self, number):
         return (round(number, 3),)

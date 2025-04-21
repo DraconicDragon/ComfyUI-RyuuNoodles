@@ -20,6 +20,8 @@ To see the settings this pack adds, please see [SETTINGS.md](SETTINGS.md).
 
 Yeeeeeee.
 
+Note: does not respect weighting yet. Its in the todo at the bottom
+
 No CLIP input required. With this repo/custom nodes you'll have the ability to add a token counter with variable tokenizers to any node/widget you desire (preferably a multiline text widget but you do you lol).
 This is done by going to the "RyuuNoodles 🐲" settings page and adding the internal node name and the widget name of that node you want the counter to be on top of.
 
@@ -150,6 +152,8 @@ The float nodes round with three decimal places to keep the funny rounding "erro
 <sub>Use [ComfyUI_NYJY](https://github.com/aidenli/ComfyUI_NYJY) for a float slider but with actual configurable options, i believe [mixlab](https://github.com/shadowcz007/comfyui-mixlab-nodes) also has one.</sub>
 
 ### Todo (maybe)
+
+- [ ] token counter: respect weighting 
 
 - [ ] make a wildcard node that works like impact pack's (possibly by using impact pack's class, would only work while the pack is installed) but have wildcard be resolved during typing and not on queuing the workflow; need to look into how to preserve the seed and output string for reproducabilty, might not be possible
 

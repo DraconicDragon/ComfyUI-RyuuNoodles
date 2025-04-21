@@ -18,9 +18,7 @@ To see the settings this pack adds, please see [SETTINGS.md](SETTINGS.md).
   <img src="assets/token_counter_overlay.gif" alt="Live token counter showcase" width="700"/>
 </p>
 
-Yeeeeeee.
-
-Note: does not respect weighting yet. Its in the todo at the bottom
+Yeeeeeee. (not shown in the GIF but it respects weighted prompts)
 
 No CLIP input required. With this repo/custom nodes you'll have the ability to add a token counter with variable tokenizers to any node/widget you desire (preferably a multiline text widget but you do you lol).
 This is done by going to the "RyuuNoodles 🐲" settings page and adding the internal node name and the widget name of that node you want the counter to be on top of.

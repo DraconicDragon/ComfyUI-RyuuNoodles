@@ -70,10 +70,11 @@ class FloatSlider(NumberNodeBase):
     DEFAULT = 0.345
     MIN = 0.0
     MAX = 1.0
-    STEP = 0.005
+    STEP = 0.005 # apparently doesnt work? Not sure if ComfyUI issue or not.
+    # IIRC it worked when it was implemented but at least after ComfyUI Frontend ~v1.19-1.20+ (maybe earlier) it stopped working.
     DESCRIPTION = (
         "Allows for setting a float value with a slider display and outputs the value rounded to 3 decimal places. \n"
-        f"Limits: min: {MIN}, max: {MAX}, step: {STEP}"
+        f"Limits: min: {MIN}, max: {MAX}, step: {STEP} (apparently stepping doesnt work on sliders (anymore)? Not sure if ComfyUI issue or not.)"
     )
 
 

@@ -1,7 +1,7 @@
 class NumberNodeBase:
     SLIDER_DISPLAY: bool = True
     NUMBER_TYPE: str = "FLOAT"  # or "INT"
-    DEFAULT: float | int = 0.542
+    DEFAULT: float | int = 1.0
     MIN: float | int = 0
     MAX: float | int = 1.0
     STEP: float | int = 0.005

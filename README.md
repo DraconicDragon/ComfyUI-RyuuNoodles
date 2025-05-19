@@ -18,7 +18,7 @@ To see the settings this pack adds, please see [SETTINGS.md](SETTINGS.md).
   <img src="assets/token_counter_overlay.gif" alt="Live token counter showcase" width="700"/>
 </p>
 
-Yeeeeeee. (not shown in the GIF but it respects weighted prompts)
+Yeeeeeee. (not shown in the GIF but it respects prompt weighting `(word_a(word_b:1.2))`)
 
 No CLIP input required. With this repo/custom nodes you'll have the ability to add a token counter with variable tokenizers to any node/widget you desire (preferably a multiline text widget but you do you lol).
 This is done by going to the "RyuuNoodles 🐲" settings page and adding the internal node name and the widget name of that node you want the counter to be on top of.
@@ -47,14 +47,14 @@ This adds the CLIP-L and T5🚀 (🚀= Fast) token counters ontop of the RyuuNoo
 <details open>
 <summary>INFO, expand me uwu.. wait, I'm already expanded!</summary>
 
-**Wildcards/Prompt Control or Scheduling etc:**  
+- **Wildcards/Prompt Control or Scheduling etc:**  
 Not supported. The counter reads what's inside the widget it's assigned to, the wildcard processor nodes only process the text when queued, same with prompt scheduling. It's possible to make a wildcard node that works, but it would have to work with an external seed/randomization thingy and whatnot, and it probably wouldnt help with reproducability/saving workflow and whatnot.  
 [comfyui-ppm](https://github.com/pamparamm/ComfyUI-ppm) and [JNodes](https://github.com/JaredTherriault/ComfyUI-JNodes) (not KJNodes) offer a Token Counter that executes when queued.
 
-**When you install this node pack**, it will do a one time download with huggingface transformers on first start after install of a few MBs of files (most are ~1 MB json files, more or less) for the supported tokenizers. (total is probably like less than 30mb maybe? dont take my word on it)
+- **When you install this node pack**, it will do a one time download with huggingface transformers on first start after install of a few MBs of files (most are ~1 MB json files, more or less) for the supported tokenizers. (total is probably like less than 30mb maybe? dont take my word on it)
 
-**Regarding the "fast" versions of the T5 tokenizer:**  
-It's faster as far as I could tell, otherwise i don't know much about it. There is one for CLIP too but it was slower for me so i didnt include it
+- **Regarding the "fast" versions of the T5 tokenizer:**  It's faster as far as I could tell, otherwise i don't know much about it. There is one for CLIP too but it was slower for me so i didnt include it
+
 </details>
 
 <details>
@@ -62,7 +62,7 @@ It's faster as far as I could tell, otherwise i don't know much about it. There 
 
 Too lazy to add detailed information here but the code to display it on the node is in `tokenCounterOverlay.js` using mainly `nodeType.prototype.onDrawForeground` and the code that turns text into tokens is in `update_token_count.py`
 
-There is a minimal standalone version/script for CLIP-L here:  
+There is a minimal standalone version/script for CLIP-L tokenization in python here:  
 <https://gist.github.com/DraconicDragon/10ac26d0d11ea9b14a0edae5d728bc96>
 </details>
 
@@ -135,7 +135,8 @@ Makes text nice and clean.
 
 (ignore that int slider says output is FLOAT, and the non 0.005 stepping, its fixed but too lazy to update gif)
 
-Edit: I added another Float node at some point with higher limits called 'Float L 🐲' meant for use as CFG in rather mainstream ranges
+Edit: I added another Float node at some point with higher limits called 'Float L 🐲' meant for use as CFG in rather mainstream ranges  
+Edit2: The Float Slider's stepping doesnt work anymore in newer comfy, likely due to a ComfyUI-frontend related change
 
 Yeah I really just wanted these and yeah, those limits are real (and not configurable as of now and probably won't be):  
 Float and Float Slider only do 0.0 to 1.0 with the second one having a stepping of 0.005  
@@ -151,7 +152,9 @@ The float nodes round with three decimal places to keep the funny rounding "erro
 
 ### Todo (maybe)
 
-- [ ] token counter: respect weighting 
+- [ ] more noodles with whatever function
+
+- [x] token counter: respect prompt weighting
 
 - [ ] make a wildcard node that works like impact pack's (possibly by using impact pack's class, would only work while the pack is installed) but have wildcard be resolved during typing and not on queuing the workflow; need to look into how to preserve the seed and output string for reproducabilty, might not be possible
 

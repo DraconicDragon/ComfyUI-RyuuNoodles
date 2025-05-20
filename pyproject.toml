@@ -1,7 +1,7 @@
 [project]
 name = "RyuuNoodles"
-description = "Collection of one or more custom nodes for ComfyUI made mainly for personal use (GitHub README for more info). \nNodes: live Token Counter on any node, switch nodes with fallback functionality and FLOAT/INT nodes (and maybe more)."
-version = "1.7.1"
+description = "Collection of a few custom nodes for ComfyUI made mainly for personal use (See GitHub README for more info). \nFeatures: live Token Counter on any node/widget; Switch + Passthrough nodes with fallback functionality; Some personally tailored FLOAT/INT nodes (and a bit more)."
+version = "2.0.0"
 license = { file = "LICENSE" }
 dependencies = ["transformers", "aiohttp"]
 

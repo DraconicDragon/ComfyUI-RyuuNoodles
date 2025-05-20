@@ -27,6 +27,8 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_IntSlider": IntSlider,
     # Token Counter
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
+    # Utils
+    "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
@@ -40,6 +42,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FloatPlainLarger": "Float L 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
+    "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
 }
 
 WEB_DIRECTORY = "./js"

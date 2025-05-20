@@ -1,11 +1,17 @@
 from .modules.clean_strings import CleanStringAdvanced
+from .modules.extract_lora import ExtractAndSaveLora
 from .modules.fallback_passthrough import FallbackPassthrough
 from .modules.fallback_switches import (
     FallbackSwitchAny,
     FallbackSwitchImage,
     FallbackSwitchLatent,
 )
-from .modules.primitive_number_ops import FloatPlain, FloatPlainLarger, FloatSlider, IntSlider
+from .modules.primitive_number_ops import (
+    FloatPlain,
+    FloatPlainLarger,
+    FloatSlider,
+    IntSlider,
+)
 from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
 
@@ -29,6 +35,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
     # Utils
     "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
+    "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
@@ -43,6 +50,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_IntSlider": "Int Slider 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
+    "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
 }
 
 WEB_DIRECTORY = "./js"

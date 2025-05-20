@@ -1,4 +1,4 @@
-from ..modules.utils.ryuu_print import ryuu_print
+from ..modules.shared.ryuu_print import ryuu_print
 
 
 class TextEncoderDiffCheck:

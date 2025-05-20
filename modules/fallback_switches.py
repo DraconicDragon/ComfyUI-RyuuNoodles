@@ -1,5 +1,5 @@
 from ..modules.fallback_switch_base import FallbackSwitchBase
-from ..modules.utils.any_type import AnyType
+from ..modules.shared.any_type import AnyType
 
 
 class FallbackSwitchAny(FallbackSwitchBase):

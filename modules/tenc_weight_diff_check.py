@@ -17,7 +17,7 @@ class TextEncoderDiffCheck:
     RETURN_NAMES = ("text_encoder_diff", "any_diff_zero", "text_projection_diff_zero")
     FUNCTION = "check"
     OUTPUT_NODE = True
-    CATEGORY = "Utils"
+    CATEGORY = "RyuuNoodles 🐲/Utils"
     DESCRIPTION = (
         "Checks if the text encoder diff is zero for any weight and specifically for *.transformer.text_projection.weight. \n"
         "Outputs a booleans indicating if any weight is zero and another boolean for the text projection weight."

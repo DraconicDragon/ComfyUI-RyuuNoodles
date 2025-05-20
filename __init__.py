@@ -5,7 +5,8 @@ from .modules.fallback_switches import (
     FallbackSwitchImage,
     FallbackSwitchLatent,
 )
-from .modules.number_ops import FloatPlain, FloatPlainLarger, FloatSlider, IntSlider
+from .modules.primitive_number_ops import FloatPlain, FloatPlainLarger, FloatSlider, IntSlider
+from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
 
 # to get the routes registered

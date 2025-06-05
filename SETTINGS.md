@@ -8,7 +8,7 @@ You can find the settings the custom node pack adds here as well as the defaults
 - **ID**: `RyuuSettings.TokenCountOverlay.Enabled`
 - **Type**: boolean
 - **Default Value**: `true`
-- **Tooltip**: Toggle to enable or disable the token counter overlay in real time.
+- **Tooltip**: 
 
 ## Token Count Overlay > Nodes configuration
 

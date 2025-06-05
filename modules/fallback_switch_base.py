@@ -1,5 +1,5 @@
 from ..modules.shared.any_type import AnyType
-from ..modules.shared.ryuu_print import ryuu_print
+from ..modules.shared.ryuu_log import ryuu_log
 
 
 class FallbackSwitchBase:
@@ -78,5 +78,5 @@ class FallbackSwitchBase:
         elif input_2_opt is not None:
             return (input_2_opt,)
         else:
-            ryuu_print(f"No {self.INPUT_NAME_2} provided, falling back to {self.INPUT_NAME_1}")
+            ryuu_log(f"No {self.INPUT_NAME_2} provided, falling back to {self.INPUT_NAME_1}")
             return (input_1,)

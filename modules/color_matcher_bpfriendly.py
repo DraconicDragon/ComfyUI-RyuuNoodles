@@ -4,7 +4,7 @@
 
 import torch
 
-from ..modules.shared.ryuu_print import ryuu_print
+from ..modules.shared.ryuu_log import ryuu_log
 
 
 class ColorMatch:
@@ -87,7 +87,7 @@ https://github.com/hahnec/color-matcher/
             try:
                 image_result = cm.transfer(src=image_target_np, ref=image_ref_np_i, method=method)
             except BaseException as e:
-                ryuu_print(f"Error occurred during transfer: {e}")
+                ryuu_log(f"Error occurred during transfer: {e}")
                 break
 
             # Apply the strength multiplier

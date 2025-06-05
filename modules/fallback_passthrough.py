@@ -1,5 +1,5 @@
 from ..modules.shared.any_type import AnyType
-from ..modules.shared.ryuu_print import ryuu_print
+from ..modules.shared.ryuu_log import ryuu_log
 
 any_type = AnyType("*")
 
@@ -43,5 +43,5 @@ class FallbackPassthrough:
         if input_2_opt is not None:
             return (input_2_opt,)
         else:
-            ryuu_print("No input_2_opt provided, falling back to input_1")
+            ryuu_log("No input_2_opt provided, falling back to input_1")
             return (input_1,)

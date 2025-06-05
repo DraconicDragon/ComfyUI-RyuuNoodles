@@ -1,4 +1,4 @@
-from ..modules.shared.ryuu_print import ryuu_print
+from ..modules.shared.ryuu_log import ryuu_log
 
 
 class TextEncoderDiffCheck:
@@ -32,13 +32,13 @@ class TextEncoderDiffCheck:
         for k, diff in sd.items():
             if k.endswith(".weight"):
                 if diff.abs().sum().item() == 0:
-                    ryuu_print("No weight difference for key %s", k)
+                    ryuu_log("No weight difference for key %s", k)
                     any_diff_zero = True
                     if k.endswith("transformer.text_projection.weight"):
                         text_projection_diff_zero = True
 
-        ryuu_print(f"[TextEncoderDiffCheck] any_diff_zero = {any_diff_zero}")
-        ryuu_print(f"[TextEncoderDiffCheck] text_projection_diff_zero = {text_projection_diff_zero}")
+        ryuu_log(f"[TextEncoderDiffCheck] any_diff_zero = {any_diff_zero}")
+        ryuu_log(f"[TextEncoderDiffCheck] text_projection_diff_zero = {text_projection_diff_zero}")
 
         return {
             "text_encoder_diff": text_encoder_diff,

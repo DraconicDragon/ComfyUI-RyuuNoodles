@@ -7,7 +7,7 @@ import comfy.model_management
 import comfy.utils
 import folder_paths
 
-from ..modules.shared.ryuu_print import ryuu_print
+from ..modules.shared.ryuu_log import ryuu_log
 
 CLAMP_QUANTILE = 0.99
 
@@ -61,11 +61,11 @@ def _check_text_encoder_diff(text_encoder_diff):
     for k, diff in sd.items():
         if k.endswith(".weight"):
             if diff.abs().sum().item() == 0:
-                ryuu_print("[Extract and Save LoRA] No weight difference for key %s", k)
+                ryuu_log("[Extract and Save LoRA] No weight difference for key %s", k)
                 any_diff_zero = True
                 if k.endswith("transformer.text_projection.weight"):
                     text_proj_zero = True
-    ryuu_print(
+    ryuu_log(
         "[Extract and Save LoRA] Text encoder any_diff_zero=%s, text_projection_diff_zero=%s",
         any_diff_zero,
         text_proj_zero,
@@ -96,7 +96,7 @@ def calc_lora_model(model_diff, rank, prefix_model, prefix_lora, output_sd, lora
                         out[1].contiguous().half().cpu()
                     )
                 except:
-                    ryuu_print(
+                    ryuu_log(
                         "[Extract and Save LoRA] Could not generate lora weights for key %s, is the weight difference a zero?",
                         k,
                     )
@@ -177,7 +177,7 @@ class ExtractAndSaveLora:
             any_zero, proj_zero = _check_text_encoder_diff(text_encoder_diff)
             skip = (skip_on_any_diff_zero and any_zero) or (skip_on_proj_diff_zero and proj_zero)
             if skip:
-                ryuu_print(
+                ryuu_log(
                     "[Extract and Save LoRA] Skipping text encoder diff inclusion (any_zero=%s, proj_zero=%s)",
                     any_zero,
                     proj_zero,

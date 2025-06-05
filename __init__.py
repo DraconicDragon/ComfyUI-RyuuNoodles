@@ -1,4 +1,5 @@
 from .modules.clean_strings import CleanStringAdvanced
+from .modules.color_matcher_bpfriendly import ColorMatch
 from .modules.extract_lora import ExtractAndSaveLora
 from .modules.fallback_passthrough import FallbackPassthrough
 from .modules.fallback_switches import (
@@ -31,6 +32,8 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_FloatPlainLarger": FloatPlainLarger,
     "Ryuu_FloatSlider": FloatSlider,
     "Ryuu_IntSlider": IntSlider,
+    # Image nodes
+    "Ryuu_ColorMatch": ColorMatch,
     # Token Counter
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
     # Utils
@@ -48,6 +51,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FloatPlain": "Float 🐲",
     "Ryuu_FloatPlainLarger": "Float L 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
+    "Ryuu_ColorMatch": "Color Match 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",

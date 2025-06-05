@@ -150,6 +150,12 @@ The float nodes round with three decimal places to keep the funny rounding "erro
 
 <sub>Use [ComfyUI_NYJY](https://github.com/aidenli/ComfyUI_NYJY) for a float slider but with actual configurable options, i believe [mixlab](https://github.com/shadowcz007/comfyui-mixlab-nodes) also has one.</sub>
 
+### Bypass-friendly Color Match node
+
+![Bypass-friendly Color Match node showcase gif](assets/bpfriendly_color_match.gif)
+
+This node is pretty much identical to the [KJNodes](https://github.com/kijai/ComfyUI-KJNodes) Color Match node (Licensed GPL v3) but it takes the target image as first input so when the node is bypassed, it will pass through the target image rather than the reference image.
+
 ### Todo (maybe)
 
 - [ ] more noodles with whatever function

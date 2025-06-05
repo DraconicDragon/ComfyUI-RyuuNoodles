@@ -1,6 +1,10 @@
 import { api } from "../../scripts/api.js";
 import { app } from "../../scripts/app.js";
 
+function isTokenCounterEnabled() {
+    return app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.Enabled") !== false;
+}
+
 // Parse the raw semicolon‑delimited setting string into a JS map:
 // { nodeName: { widget, tok_types: [...] } }
 function parseSettingsString(raw) {
@@ -40,13 +44,21 @@ function prettifyTokenizerName(tok) {
 function startCounting(node) {
     node._lastText = "";
     node._tokenCounts = {};
+    node._tokenCounterActive = true;
 
     // using a recursive timeout to be able to adjust delay every tick
     async function tick() {
+        // Stop if disabled or node is deactivated
+        if (!isTokenCounterEnabled() || !node._tokenCounterActive) {
+            node._tokenCounts = {};
+            node.setDirtyCanvas?.(true);
+            return;
+        }
+
         // read settings dynamically
         const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
         const updateInterval = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.UpdateInterval") || 1000;
-        const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false; 
+        const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
         const mapping = parseSettingsString(rawSettingsString);
         const mapConfig = mapping[node._mapConfigName];
         if (!mapConfig) return;
@@ -85,6 +97,21 @@ function startCounting(node) {
     tick();
 }
 
+// Listen for toggle changes and clear overlays if disabled
+window.addEventListener("RyuuNoodles.TokenCounterOverlay.Toggle", (e) => {
+    const enabled = e.detail;
+    for (const node of Object.values(app.graph._nodes || {})) {
+        if (node && node._tokenCounts !== undefined) {
+            if (!enabled) {
+                node._tokenCounts = {};
+                node.setDirtyCanvas?.(true);
+            } else if (!node._tokenCounterActive) {
+                node._tokenCounterActive = true;
+                startCounting(node);
+            }
+        }
+    }
+});
 
 async function registerTokenCountNode(nodeType, nodeData) {
     // remember node name in each instance
@@ -93,6 +120,10 @@ async function registerTokenCountNode(nodeType, nodeData) {
     // preserve original onDrawForeground
     const originalOnDrawFG = nodeType.prototype.onDrawForeground;
     nodeType.prototype.onDrawForeground = function (ctx) {
+
+        // Only draw overlay if enabled
+        if (!isTokenCounterEnabled()) return;
+
         originalOnDrawFG?.apply(this, arguments); // call original method, then custom stuff
 
         // re‑parse settings so widget renames or tok_types changes apply immediately
@@ -128,6 +159,7 @@ async function registerTokenCountNode(nodeType, nodeData) {
     nodeType.prototype.onNodeCreated = function () {
         originalOnNodeCreated?.apply(this, arguments); // call original method, then custom stuff
         this._mapConfigName = theNodeName;
+        this._tokenCounterActive = true;
         startCounting(this);
     };
 }

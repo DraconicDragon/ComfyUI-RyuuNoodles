@@ -48,6 +48,20 @@ app.registerExtension({
                 "Please check the GitHub README for more info",
             // todo: tooltips and textbox are far too small for this :pensive:
         },
+
+        {
+            id: "RyuuSettings.TokenCountOverlay.Enabled",
+            category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Enable/Disable'],
+            name: "Enable Token Counter Overlay",
+            type: "boolean",
+            defaultValue: true,
+            //tooltip: "Toggle to enable or disable the token counter overlay in real time.",
+            onChange: (newVal, oldVal) => {
+                console.log(`RyuuSettings.TokenCountOverlay.Enabled changed from ${oldVal} to ${newVal}`);
+                // Notify all nodes to update their overlays immediately
+                window.dispatchEvent(new CustomEvent("RyuuNoodles.TokenCounterOverlay.Toggle", { detail: newVal }));
+            },
+        },
     ],
 });
 

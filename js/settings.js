@@ -55,7 +55,6 @@ app.registerExtension({
             name: "Enable Token Counter Overlay",
             type: "boolean",
             defaultValue: true,
-            //tooltip: "Toggle to enable or disable the token counter overlay in real time.",
             onChange: (newVal, oldVal) => {
                 console.log(`RyuuSettings.TokenCountOverlay.Enabled changed from ${oldVal} to ${newVal}`);
                 // Notify all nodes to update their overlays immediately

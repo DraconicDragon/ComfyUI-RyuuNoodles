@@ -64,7 +64,7 @@ https://github.com/hahnec/color-matcher/
             from color_matcher import ColorMatcher
         except:
             raise Exception(
-                "Can't import color-matcher, did you install requirements.txt? Manual install: pip install color-matcher"
+                "[RyuuNoodles Color Match] Can't import color-matcher, did you install requirements.txt? Manual install: pip install color-matcher"
             )
         cm = ColorMatcher()
         image_ref = image_ref.cpu()
@@ -78,7 +78,7 @@ https://github.com/hahnec/color-matcher/
         images_target_np = images_target.numpy()
 
         if image_ref.size(0) > 1 and image_ref.size(0) != batch_size:
-            raise ValueError("ColorMatch: Use either single reference image or a matching batch of reference images.")
+            raise ValueError("[RyuuNoodles Color Match] Use either single reference image or a matching batch of reference images.")
 
         for i in range(batch_size):
             image_target_np = images_target_np if batch_size == 1 else images_target[i].numpy()
@@ -87,7 +87,7 @@ https://github.com/hahnec/color-matcher/
             try:
                 image_result = cm.transfer(src=image_target_np, ref=image_ref_np_i, method=method)
             except BaseException as e:
-                ryuu_log(f"Error occurred during transfer: {e}")
+                ryuu_log(f"[Color Match] Error occurred during transfer: {e}", loglevel="error")
                 break
 
             # Apply the strength multiplier

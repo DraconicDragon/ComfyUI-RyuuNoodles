@@ -6,9 +6,20 @@
 
 Collection of one or more custom nodes for ComfyUI made mainly for personal use <sub><sub><sub>...rawr...</sub></sub></sub>
 
-ComfyUI Registry: https://registry.comfy.org/nodes/RyuuNoodles
+ComfyUI Registry: <https://registry.comfy.org/nodes/RyuuNoodles>
 
 To see the settings this pack adds, please see [SETTINGS.md](SETTINGS.md).
+
+## Table of Contents
+
+- [Features/Nodes](#featuresnodes)
+  - [Live Token Counter on Textboxes](#live-token-counter-on-textboxes)
+  - [Switches with Fallback](#switches-with-fallback)
+  - [Passthrough node](#passthrough-node)
+  - [Strings/Text](#stringstext)
+  - [Numbers/Sliders](#numberssliders)
+  - [Bypass-friendly Color Match node](#bypass-friendly-color-match-node)
+- [Todo (maybe)](#todo-maybe)
 
 ## Features/Nodes
 

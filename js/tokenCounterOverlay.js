@@ -212,7 +212,7 @@ async function registerTokenCountNode(nodeType, nodeData) {
         originalOnDrawFG?.apply(this, arguments); // call original method, then custom stuff
 
         // Only draw overlay if enabled
-        if (!isTokenCounterEnabled()) return;
+        if (!isTokenCounterEnabled() || this.collapsed) return;
 
         // re‑parse settings so widget renames or tok_types changes apply immediately
         const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";

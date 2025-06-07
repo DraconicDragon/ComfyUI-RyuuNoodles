@@ -25,7 +25,7 @@ app.registerExtension({
             type: "slider",
             attrs: {
                 min: 100,
-                max: 10000,
+                max: 2500,
                 step: 25,
             },
             defaultValue: 1000,

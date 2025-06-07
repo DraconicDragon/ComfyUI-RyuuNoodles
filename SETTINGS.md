@@ -23,7 +23,7 @@ You can find the settings the custom node pack adds here as well as the defaults
 - **Type**: slider
 - **Attributes**:
   - `min`: 100
-  - `max`: 10000
+  - `max`: 2500
   - `step`: 25
 - **Default Value**: `1000`
 - **Tooltip**: Default: 1000 Suggested to stay above 200ms.

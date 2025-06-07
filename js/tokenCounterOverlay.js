@@ -40,91 +40,164 @@ function prettifyTokenizerName(tok) {
     return hasFast ? `${title}🚀` : title;
 }
 
-// Function to start counting tokens in the specified node's widget
-function startCounting(node) {
-    // Clear any existing timer
-    if (node._tokenCounterTimeout) {
-        clearTimeout(node._tokenCounterTimeout);
-        node._tokenCounterTimeout = null;
-    }
-
-    node._lastText = "";
-    node._tokenCounts = {};
-
-    // using a recursive timeout to be able to adjust delay every tick
-    async function tick() {
-        // read settings dynamically
-        const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
-        const updateInterval = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.UpdateInterval") || 1000;
-        const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
-        const mapping = parseSettingsString(rawSettingsString);
-        const mapConfig = mapping[node._mapConfigName];
-
-        const enabled = isTokenCounterEnabled();
-
-        if (!enabled) {
-            // Clear tokens but keep timer running
-            node._tokenCounts = {};
-            node.setDirtyCanvas?.(true);
-        } else if (mapConfig) {
-            // find the widget each tick in case they renamed it
-            const w = node.widgets.find(w => w.name === mapConfig.widget);
-            const inputText = (w?.value ?? "") + "";
-
-            // skip if text unchanged
-            if (inputText !== node._lastText) {
-                node._lastText = inputText;
-                try {
-                    const resp = await api.fetchApi("/ryuu/update_token_count", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            text: inputText,
-                            tok_types: mapConfig.tok_types,
-                            add_special_tokens: addSpecialTokens,
-                        }),
-                    });
-
-                    const data = await resp.json();
-                    node._tokenCounts = data.token_counts || {};
-                } catch (e) {
-                    console.error("Token count error:", e);
-                }
-                node.setDirtyCanvas(true);
-            }
-        }
-
-        // always schedule next tick regardless of enabled state
-        // todo: actually have the loop stop on disabling and not just not show counter
-        node._tokenCounterTimeout = setTimeout(tick, updateInterval);
-    }
-
-    // start the function off
-    tick();
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
-function stopCounting(node) {
-    if (node._tokenCounterTimeout) {
-        clearTimeout(node._tokenCounterTimeout);
-        node._tokenCounterTimeout = null;
+async function updateTokenCount(node) {
+    // Don't do anything if disabled
+    if (!isTokenCounterEnabled()) return;
+
+    const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
+    const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
+    const mapping = parseSettingsString(rawSettingsString);
+    const mapConfig = mapping[node._mapConfigName];
+
+    if (!mapConfig) return;
+
+    const widget = node.widgets.find(w => w.name === mapConfig.widget);
+    if (!widget) return;
+
+    const inputText = (widget.value ?? "") + "";
+
+    // skip if text unchanged
+    if (inputText === node._lastText) return;
+
+    node._lastText = inputText;
+
+    try {
+        const resp = await api.fetchApi("/ryuu/update_token_count", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                text: inputText,
+                tok_types: mapConfig.tok_types,
+                add_special_tokens: addSpecialTokens,
+            }),
+        });
+
+        const data = await resp.json();
+        node._tokenCounts = data.token_counts || {};
+    } catch (e) {
+        console.error("[TokenCounter] Error:", e);
+        node._tokenCounts = {};
     }
-    node._tokenCounts = {};
-    node._lastText = "";
+
     node.setDirtyCanvas?.(true);
 }
 
-// Listen for toggle changes and clear overlays if disabled
+// Enable token counting
+function enableCounting(node) {
+    // Clean up first to avoid duplicate handlers
+    disableCounting(node);
+
+    // Initialize state
+    node._lastText = "";
+    node._tokenCounts = {};
+
+    // a special debounce function that reads the interval dynamically
+    node._debouncedUpdate = function () {
+        // Clear any existing timeout
+        if (node._updateTimeout) {
+            clearTimeout(node._updateTimeout);
+        }
+
+        // Get the current interval from settings
+        const updateInterval = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.UpdateInterval") || 1000;
+
+        // Schedule the update with the current interval
+        node._updateTimeout = setTimeout(() => {
+            updateTokenCount(node);
+        }, updateInterval);
+    };
+
+    // Find the target widget
+    const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
+    const mapping = parseSettingsString(rawSettingsString);
+    const mapConfig = mapping[node._mapConfigName];
+
+    if (!mapConfig) return;
+
+    const widget = node.widgets.find(w => w.name === mapConfig.widget);
+    if (!widget) return;
+
+    // Save original callback if not already saved
+    if (!node._originalWidgetCallback) {
+        node._originalWidgetCallback = widget.callback;
+    }
+
+    widget.callback = function (...args) {
+        // Call original if it exists
+        if (node._originalWidgetCallback) {
+            node._originalWidgetCallback.apply(this, args);
+        }
+
+        // Only call our update if enabled
+        if (isTokenCounterEnabled()) {
+            node._debouncedUpdate();
+        }
+    };
+
+    // Force initial update
+    updateTokenCount(node);
+}
+
+// Disable token counting
+function disableCounting(node) {
+    // Clear any pending timeout
+    if (node._updateTimeout) {
+        clearTimeout(node._updateTimeout);
+        node._updateTimeout = null;
+    }
+
+    // Clear token counts to hide display
+    node._tokenCounts = {};
+
+    // Restore original widget callback if there's one
+    if (node._originalWidgetCallback) {
+        const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
+        const mapping = parseSettingsString(rawSettingsString);
+        const mapConfig = mapping[node._mapConfigName];
+
+        if (mapConfig) {
+            const widget = node.widgets.find(w => w.name === mapConfig.widget);
+            if (widget) {
+                widget.callback = node._originalWidgetCallback;
+            }
+        }
+    }
+
+    // Clean up other properties
+    node._debouncedUpdate = null;
+    node.setDirtyCanvas?.(true);
+}
+
+// Listen for toggle changes
 window.addEventListener("RyuuNoodles.TokenCounterOverlay.Toggle", (e) => {
     const enabled = e.detail;
+
+    // Sync the runtime toggle back into the saved setting,
+    // so isTokenCounterEnabled() will actually return true again
+    app.extensionManager.setting.set(
+        "RyuuSettings.TokenCountOverlay.Enabled",
+        enabled
+    );
+
     for (const node of Object.values(app.graph._nodes || {})) {
-        if (node && node._mapConfigName !== undefined) {
-            if (!enabled) {
-                node._tokenCounts = {};
+        if (node && node._mapConfigName) {
+            if (enabled) {
+                enableCounting(node);
             } else {
-                // Force refresh by clearing last text
-                node._lastText = "";
+                disableCounting(node);
             }
-            node.setDirtyCanvas?.(true);
         }
     }
 });
@@ -153,10 +226,10 @@ async function registerTokenCountNode(nodeType, nodeData) {
 
         // build "Clip L Tokens: 0 | T5🚀 Tokens: 0 | Chars: 0"
         const parts = nodeWidgetMappingConfig.tok_types.map(tt => {
-            const cnt = this._tokenCounts[tt] || 0;
+            const cnt = this._tokenCounts?.[tt] || 0;
             return `${prettifyTokenizerName(tt)} Tokens: ${cnt}`;
         });
-        parts.push(`Chars: ${this._lastText?.length || 0}`);
+        parts.push(`Chars: ${(this._lastText || "").length}`);
         const txt = parts.join(" | ");
 
         // text styling
@@ -174,13 +247,18 @@ async function registerTokenCountNode(nodeType, nodeData) {
     nodeType.prototype.onNodeCreated = function () {
         originalOnNodeCreated?.apply(this, arguments); // call original method, then custom stuff
         this._mapConfigName = theNodeName;
-        startCounting(this);
+
+        // Only enable counting if the toggle is enabled
+        if (isTokenCounterEnabled()) {
+            enableCounting(this);
+        }
     };
 
     // Clean up on node removal
     const originalOnRemoved = nodeType.prototype.onRemoved;
     nodeType.prototype.onRemoved = function () {
-        stopCounting(this);
+        disableCounting(this);
+        this._originalWidgetCallback = null; // Completely clean up
         originalOnRemoved?.apply(this, arguments);
     };
 }

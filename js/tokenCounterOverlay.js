@@ -40,18 +40,6 @@ function prettifyTokenizerName(tok) {
     return hasFast ? `${title}🚀` : title;
 }
 
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
 async function updateTokenCount(node) {
     // Don't do anything if disabled
     if (!isTokenCounterEnabled()) return;

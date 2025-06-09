@@ -17,7 +17,7 @@ from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
 
 # to get the routes registered
-from .pyserver import update_token_count
+from .pyserver import update_token_count  # noqa: F401
 
 NODE_CLASS_MAPPINGS = {
     # Switches and Passthrough nodes
@@ -55,7 +55,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     # Experimental Nodes/Utils
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
-        "Ryuu_CleanStringAdvanced": "Clean String Advanced 🐲",
+    "Ryuu_CleanStringAdvanced": "Clean String Advanced 🐲",
 
 }
 

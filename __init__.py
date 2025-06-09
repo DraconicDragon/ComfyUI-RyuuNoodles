@@ -20,8 +20,6 @@ from .modules.token_count_textbox import TokenCountTextBox
 from .pyserver import update_token_count
 
 NODE_CLASS_MAPPINGS = {
-    # String cleaning/stripping nodes
-    "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
     # Switches and Passthrough nodes
     "Ryuu_FallbackPassthrough": FallbackPassthrough,
     "Ryuu_FallbackSwitchAny": FallbackSwitchAny,
@@ -39,10 +37,11 @@ NODE_CLASS_MAPPINGS = {
     # Experimental Nodes/Utils
     "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
+    # String cleaning/stripping nodes
+    "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
-    "Ryuu_CleanStringAdvanced": "Clean String Advanced 🐲",
     "Ryuu_FallbackSwitchAny": "Switch Any Fallback 🐲",
     "Ryuu_FallbackSwitchImage": "Switch Image Fallback 🐲",
     "Ryuu_FallbackSwitchLatent": "Switch Latent Fallback 🐲",
@@ -56,6 +55,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     # Experimental Nodes/Utils
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
+        "Ryuu_CleanStringAdvanced": "Clean String Advanced 🐲",
+
 }
 
 WEB_DIRECTORY = "./js"

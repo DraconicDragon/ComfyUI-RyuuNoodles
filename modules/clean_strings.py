@@ -61,6 +61,8 @@ class CleanStringAdvanced:
     RETURN_NAMES = ("text",)
     FUNCTION = "clean_text"
 
+    EXPERIMENTAL = True
+
     DESCRIPTION = (
         "Cleans up and formats the given text with a set of optional filters:\n"
         "- Strip whitespace (off/left/right/both) from the input string\n"

@@ -62,7 +62,10 @@ This adds the CLIP-L and T5🚀 (🚀= Fast) token counters ontop of the RyuuNoo
 Not supported. The counter reads what's inside the widget it's assigned to, the wildcard processor nodes only process the text when queued, same with prompt scheduling. It's possible to make a wildcard node that works, but it would have to work with an external seed/randomization thingy and whatnot, and it probably wouldnt help with reproducability/saving workflow and whatnot.  
 [comfyui-ppm](https://github.com/pamparamm/ComfyUI-ppm) and [JNodes](https://github.com/JaredTherriault/ComfyUI-JNodes) (not KJNodes) offer a Token Counter that executes when queued.
 
-- **When you install this node pack**, it will do a one time download with huggingface transformers on first start after install of a few MBs of files (most are ~1 MB json files, more or less) for the supported tokenizers. (total is probably like less than 30mb maybe? dont take my word on it)
+- **When you install this node pack** ~~it will do a one time download with huggingface transformers on first start after install of a few MBs of files (most are ~1 MB json files, more or less) for the supported tokenizers. (total is probably like less than 30mb maybe? dont take my word on it)~~  
+The tokenizers are now loaded on demand and cached to improve startup speed of the nodepack. Upon first use after installing it might take a few seconds or minutes (if your internet is horrible, like mine) for the tokenizers to download (all tokenizers in total are maybe 20-40mb, no actual models are downloaded).  
+If they are already downloaded and you just started comfy it should only take ~1 second after typing in a textbox (with counter assigned) for the counter to start working.  
+The tokenizers are downloaded using transformers/huggingface_hub so if you want to change the download location you have to set the corresponding [environment variables](https://huggingface.co/docs/huggingface_hub/en/package_reference/environment_variables) (untested if works.)
 
 - **Regarding the "fast" versions of the T5 tokenizer:**  It's faster as far as I could tell, otherwise i don't know much about it. There is one for CLIP too but it was slower for me so i didnt include it
 

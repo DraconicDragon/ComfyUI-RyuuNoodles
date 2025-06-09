@@ -5,47 +5,57 @@ from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerF
 
 from server import PromptServer  # type: ignore
 
-# load once at module load
-
-# CLIP-L, SDXL, FLUX (2nd), SD3(.5), etc
-clip_l_tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14")  # NOTE: fast version isnt faster
-
-# CLIP-G
-# clip_g_tokenizer = CLIPTokenizer.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", subfolder="tokenizer_2")
-
-# NOTE: BFL flux dev is also possible, but they should all do the same thing because same spiece.model file iirc
-t5_tokenizer = T5Tokenizer.from_pretrained("google/t5-v1_1-xxl")
-
-t5_tokenizer_fast = T5TokenizerFast.from_pretrained("google/t5-v1_1-xxl")  # its faster, but idk otherwise
-
-# UMT5 XXL, WAN2.1
-umt5_tokenizer = AutoTokenizer.from_pretrained("google/umt5-xxl")
-
-# Gemma 2 2B, Lumina Image 2.0
-gemma2_tokenizer = AutoTokenizer.from_pretrained("unsloth/gemma-2-2b")  # official repo is gated
-
-# LLaMA 3.1 8B, hidream and hunyuan i believe?
-llama3_tokenizer = AutoTokenizer.from_pretrained("unsloth/Meta-Llama-3.1-8B-Instruct")  # official repo is gated
-
-# AuraFlow Text encoder (probably pile t5 or something?)
-auraflow_tokenizer = AutoTokenizer.from_pretrained("fal/AuraFlow", subfolder="tokenizer")
+from ..modules.shared.ryuu_log import ryuu_log
 
 INCLUDE_TOKENS = False
 
 routes = PromptServer.instance.routes
 
-# not important but, CLIP-G (pretty sure it just has '!' as padding token over L) https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/tree/main/tokenizer_2
+# Lazy tokenizer loader and cache
+_tokenizer_cache = {}
 
-# map normalized names → tokenizer instances
-tok_map = {
-    "clip_l": clip_l_tokenizer,
-    "t5": t5_tokenizer,
-    "t5_fast": t5_tokenizer_fast,
-    "umt5": umt5_tokenizer,
-    "gemma2": gemma2_tokenizer,
-    "llama3": llama3_tokenizer,
-    "auraflow": auraflow_tokenizer,
-}
+
+def load_and_log(tokenizer_cls, *args, log_name=None, **kwargs):
+    if log_name:
+        ryuu_log(f"Loading {log_name} tokenizer...", loglevel="debug")
+    tok = tokenizer_cls.from_pretrained(*args, **kwargs)
+    if log_name:
+        ryuu_log(f"Loaded {log_name} tokenizer.", loglevel="debug")
+    return tok
+
+
+def get_tokenizer(name):
+    key = name.lower().strip()
+    if key in _tokenizer_cache:
+        return _tokenizer_cache[key]
+    if key == "clip_l":  # CLIP-L | SDXL, FLUX (2nd), SD3(.5), etc
+        # NOTE: CLIP-L Fast tokenizer is NOT faster
+        tok = load_and_log(CLIPTokenizer, "openai/clip-vit-large-patch14", log_name="CLIP-L")
+
+    # CLIP-G tok is practically almost exact same as CLIP-L tok
+    # not important but, CLIP-G (pretty sure it just has '!' as padding token over L) https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/tree/main/tokenizer_2
+    # elif key == "clip_g":  # CLIP-G | SDXL, SD3(.5), etc
+    #     tok = load_and_log(
+    #         CLIPTokenizer, "stabilityai/stable-diffusion-xl-base-1.0", subfolder="tokenizer_2", log_name="CLIP-G"
+    #     )
+
+    elif key == "t5":  # T5-XXL | Chroma, Flux (1st), SD3(.5), etc
+        # # NOTE: BFL flux dev is also possible, but they should all do the same thing because same spiece.model file iirc
+        tok = load_and_log(T5Tokenizer, "google/t5-v1_1-xxl", log_name="T5")
+    elif key == "t5_fast":  # T5-XXL | Faster | Flux (1st), SD3(.5), etc
+        tok = load_and_log(T5TokenizerFast, "google/t5-v1_1-xxl", log_name="T5-Fast")
+    elif key == "umt5":  # umt5-XXL | WAN 2.1
+        tok = load_and_log(AutoTokenizer, "google/umt5-xxl", log_name="UMT5")
+    elif key == "gemma2":  # Gemma 2 2B | Lumina Image 2.0
+        tok = load_and_log(AutoTokenizer, "unsloth/gemma-2-2b", log_name="Gemma2")
+    elif key == "llama3":  # LLaMA 3.1 8B | hidream, hunyuan video, etc
+        tok = load_and_log(AutoTokenizer, "unsloth/Meta-Llama-3.1-8B-Instruct", log_name="LLaMA3")
+    elif key == "auraflow":  # Pile T5 me thinks | AuraFlow/PonyFlow (Pony v7)
+        tok = load_and_log(AutoTokenizer, "fal/AuraFlow", subfolder="tokenizer", log_name="AuraFlow")
+    else:
+        tok = None
+    _tokenizer_cache[key] = tok
+    return tok
 
 
 # Helper function to strip weighting syntax from the text
@@ -119,8 +129,7 @@ async def update_token_count(request):
     tokens_map = {}
 
     for name in tok_types:
-        key = name.lower().strip()
-        tokenizer = tok_map.get(key)
+        tokenizer = get_tokenizer(name)
         if tokenizer is None:
             token_counts[name] = None
             if INCLUDE_TOKENS:
@@ -130,7 +139,6 @@ async def update_token_count(request):
         # run the tokenizer
         outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
         num = outputs["input_ids"].shape[1]
-
         token_counts[name] = num
 
         if INCLUDE_TOKENS:

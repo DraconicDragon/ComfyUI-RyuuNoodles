@@ -36,7 +36,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_ColorMatch": ColorMatch,
     # Token Counter
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
-    # Utils
+    # Experimental Nodes/Utils
     "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
 }
@@ -53,6 +53,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_IntSlider": "Int Slider 🐲",
     "Ryuu_ColorMatch": "Color Match 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
+    # Experimental Nodes/Utils
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
 }

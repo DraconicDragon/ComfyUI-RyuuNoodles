@@ -138,6 +138,7 @@ class ExtractAndSaveLora:
     RETURN_TYPES = ()
     FUNCTION = "extract_and_save"
     OUTPUT_NODE = True
+    EXPERIMENTAL = True
     CATEGORY = "RyuuNoodles 🐲/Utils"
     DESCRIPTION = (
         "Saves the model and text encoder diffs as LoRA weights. \n"

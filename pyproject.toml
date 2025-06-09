@@ -1,7 +1,7 @@
 [project]
 name = "RyuuNoodles"
 description = "Collection of a few custom nodes made mainly for personal use (See GitHub README for more info). \nFeatures: live Token Counter on any node/widget; Switch + Passthrough nodes with fallback functionality; Some personally tailored FLOAT/INT nodes (and a bit more)."
-version = "2.2.3"
+version = "2.3.0"
 license = { file = "LICENSE" }
 dependencies = ["transformers", "aiohttp", "color-matcher"]
 

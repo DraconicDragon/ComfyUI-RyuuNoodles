@@ -256,6 +256,25 @@ class HTMLPopup {
             }
         });
         this.resizeObserver.observe(this.container);
+
+        // Prevent pointer events on content during drag/resize
+        this.container.addEventListener('mousedown', (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const isHeaderDrag = e.target.closest('.header') || e.clientY <= rect.top + 32;
+            const isResize = e.clientX >= rect.right - 20 && e.clientY >= rect.bottom - 20;
+
+            if (isHeaderDrag || isResize) {
+                // Disable pointer events on content during interaction
+                this.content.style.pointerEvents = 'none';
+
+                const enablePointerEvents = () => {
+                    this.content.style.pointerEvents = 'auto';
+                    document.removeEventListener('mouseup', enablePointerEvents);
+                };
+
+                document.addEventListener('mouseup', enablePointerEvents);
+            }
+        });
     }
 
     // Update header style based on focus state
@@ -458,11 +477,11 @@ class HTMLPopup {
             const heightToSave = this._originalSize ? this._originalSize.height + "px" : currentHeight;
             const widthToSave = this._originalSize ? this._originalSize.width + "px" : currentWidth;
 
-            this._preCollapse = { 
-                height: heightToSave, 
+            this._preCollapse = {
+                height: heightToSave,
                 width: widthToSave
             };
-            
+
             this.content.style.display = "none";
             this.collapseBtn.innerHTML = "&#x25BC;"; // Down triangle
             this.container.style.height = this.header.offsetHeight + "px";

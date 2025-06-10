@@ -1,3 +1,4 @@
+from .modules.pn import HTMLDisplayNode
 from .modules.clean_strings import CleanStringAdvanced
 from .modules.color_matcher_bpfriendly import ColorMatch
 from .modules.extract_lora import ExtractAndSaveLora
@@ -39,6 +40,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
     # String cleaning/stripping nodes
     "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
+    "Ryuu_HTMLDisplayNode": HTMLDisplayNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
@@ -56,6 +58,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
     "Ryuu_CleanStringAdvanced": "Clean String Advanced 🐲",
+    "Ryuu_HTMLDisplayNode": "HTML Display 🐲",
 
 }
 

@@ -1,12 +1,11 @@
 import { app } from "../../scripts/app.js";
-import { htmlPopup } from "./ryuu_popup.js";
+import { windowManager } from "./ryuu_popup.js";
 
 app.registerExtension({
     name: "RyuuNoodles.HTMLDisplayNode",
     async beforeRegisterNodeDef(nodeType, nodeData) {
         if (nodeData.name !== "Ryuu_HTMLDisplayNode") return;
 
-        // overriding onNodeCreated to add the render button
         nodeType.prototype.onNodeCreated = function () {
             this.addWidget("button", "Show HTML Popup", null, () => {
                 const htmlInput = this.widgets.find(w => w.name === "html_string");
@@ -20,17 +19,20 @@ app.registerExtension({
                 const nodeId = this.id || "Unknown ID";
                 const popupTitle = `${nodeTitle} (ID: ${nodeId})`;
 
-                // Check if we should use URL or HTML content
+                // Get popup for this specific node
+                // Yes, I still call them popups even though they are windows, I think
+                const popup = windowManager.getPopupForNode(nodeId.toString());
+
                 const useUrl = useUrlInput ? useUrlInput.value : false;
                 const url = urlInput && urlInput.value ? urlInput.value.trim() : "";
 
                 if (useUrl && url) {
                     // Show webpage in popup
-                    htmlPopup.showUrl(url, popupTitle, this);
+                    popup.showUrl(url, popupTitle);
                 } else {
-                    // Show HTML content
+                    // Show content from text input
                     const htmlContent = htmlInput.value || "<b>No content provided</b>";
-                    htmlPopup.show(htmlContent, popupTitle, this);
+                    popup.show(htmlContent, popupTitle);
                 }
             });
         };

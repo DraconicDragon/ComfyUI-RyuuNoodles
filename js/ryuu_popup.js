@@ -1,5 +1,76 @@
-class HTMLPopup {
+// Window Manager to handle multiple popups
+class PopupWindowManager {
     constructor() {
+        this.popups = new Map(); // nodeId -> HTMLPopup
+        this.zIndexCounter = 10000;
+        this.activePopup = null;
+    }
+
+    // Create or get popup for a specific node
+    getPopupForNode(nodeId) {
+        if (!this.popups.has(nodeId)) {
+            const popup = new HTMLPopup(nodeId, this);
+            this.popups.set(nodeId, popup);
+        }
+        return this.popups.get(nodeId);
+    }
+
+    // Remove popup for a specific node
+    removePopupForNode(nodeId) {
+        const popup = this.popups.get(nodeId);
+        if (popup) {
+            popup.destroy();
+            this.popups.delete(nodeId);
+            if (this.activePopup === popup) {
+                this.activePopup = null;
+            }
+        }
+    }
+
+    // Set active popup (brings to front)
+    setActivePopup(popup) {
+        if (this.activePopup === popup) return;
+
+        // Unfocus previous active popup
+        if (this.activePopup) {
+            this.activePopup.setFocused(false);
+        }
+
+        // Focus new popup
+        this.activePopup = popup;
+        popup.setFocused(true);
+        popup.bringToFront(++this.zIndexCounter);
+    }
+
+    // Check if node still exists in the graph
+    cleanupOrphanedPopups() {
+        if (!window.app || !app.graph) return;
+
+        const existingNodeIds = new Set();
+        if (app.graph._nodes) {
+            for (const node of Object.values(app.graph._nodes)) {
+                if (node && node.id !== undefined) {
+                    existingNodeIds.add(node.id.toString());
+                }
+            }
+        }
+
+        // Remove popups for deleted nodes
+        for (const [nodeId, popup] of this.popups.entries()) {
+            if (!existingNodeIds.has(nodeId)) {
+                console.log(`Removing orphaned popup for deleted node ${nodeId}`);
+                this.removePopupForNode(nodeId);
+            }
+        }
+    }
+}
+
+class HTMLPopup {
+    constructor(nodeId, windowManager) {
+        this.nodeId = nodeId;
+        this.windowManager = windowManager;
+        this.focused = true;
+
         // Create main container
         this.container = document.createElement("div");
         Object.assign(this.container.style, {
@@ -22,24 +93,19 @@ class HTMLPopup {
             resize: "both",
         });
 
+        // Add click handler to bring popup to front
+        this.container.addEventListener('mousedown', () => {
+            this.windowManager.setActivePopup(this);
+        });
+
         // Create header (draggable area + collapse + title + close button)
         this.header = document.createElement("div");
-        Object.assign(this.header.style, {
-            padding: "0", // Remove padding to eliminate margins
-            backgroundColor: "#333",
-            borderBottom: "1px solid #444",
-            display: "flex",
-            alignItems: "stretch", // Make buttons stretch to full height
-            cursor: "move",
-            userSelect: "none",
-            height: "32px",
-            minHeight: "32px"
-        });
+        this.updateHeaderStyle(true); // Start focused
         this.container.appendChild(this.header);
 
-        // Collapse button (now on the left)
+        // Collapse button
         this.collapseBtn = document.createElement("button");
-        this.collapseBtn.innerHTML = "&#x25B2;"; // Up triangle
+        this.collapseBtn.innerHTML = "&#x25B2;";
         Object.assign(this.collapseBtn.style, {
             background: "none",
             border: "none",
@@ -81,9 +147,6 @@ class HTMLPopup {
         });
         this.header.appendChild(this.title);
 
-        // Store reference to source node
-        this.sourceNode = null;
-
         // Close button
         this.closeBtn = document.createElement("button");
         this.closeBtn.textContent = "×";
@@ -112,10 +175,10 @@ class HTMLPopup {
             this.closeBtn.style.color = "#fff";
             this.closeBtn.style.background = "none";
         };
-        this.closeBtn.onclick = () => this.hide();
+        this.closeBtn.onclick = () => this.windowManager.removePopupForNode(this.nodeId);
         this.header.appendChild(this.closeBtn);
 
-        // Content area with shadow DOM to isolate CSS
+        // Content area
         this.content = document.createElement("div");
         Object.assign(this.content.style, {
             padding: "12px",
@@ -158,7 +221,6 @@ class HTMLPopup {
             });
             this.shadowRoot.appendChild(this.htmlContainer);
         } else {
-            // Fallback for browsers that don't support shadow DOM
             this.htmlContainer = this.content;
         }
 
@@ -179,7 +241,7 @@ class HTMLPopup {
 
         // Out of bounds state for right/bottom dragging
         this._originalSize = null;
-        this._isOOBResizing = false; // ADD THIS FLAG
+        this._isOOBResizing = false;
 
         // Track manual resizing when collapsed
         this.resizeObserver = new ResizeObserver(() => {
@@ -196,14 +258,40 @@ class HTMLPopup {
         this.resizeObserver.observe(this.container);
     }
 
-    // Show popup with HTML content, centered at 60% screen size
-    show(html, title = "HTML Content", sourceNode = null) {
-        this.sourceNode = sourceNode; // Store reference to the node
-        this.title.textContent = title;
+    // Update header style based on focus state
+    updateHeaderStyle(focused) {
+        const backgroundColor = focused ? "#333" : "#2a2a2a";
+        const borderColor = focused ? "#444" : "#333";
 
+        Object.assign(this.header.style, {
+            padding: "0",
+            backgroundColor: backgroundColor,
+            borderBottom: `1px solid ${borderColor}`,
+            display: "flex",
+            alignItems: "stretch",
+            cursor: "move",
+            userSelect: "none",
+            height: "32px",
+            minHeight: "32px"
+        });
+    }
+
+    // Set focus state
+    setFocused(focused) {
+        this.focused = focused;
+        this.updateHeaderStyle(focused);
+    }
+
+    // Bring popup to front
+    bringToFront(zIndex) {
+        this.container.style.zIndex = zIndex;
+    }
+
+    // Show popup with HTML content
+    show(html, title = "HTML Content") {
+        this.title.textContent = title;
         // Restore padding for HTML content
         this.content.style.padding = "12px";
-
         this.htmlContainer.innerHTML = html;
 
         // Reset htmlContainer styles for HTML content
@@ -225,9 +313,9 @@ class HTMLPopup {
         this.container.style.left = "50%";
         this.container.style.transform = "translate(-50%, -50%)";
 
-        // Set initial size to 60% of viewport
-        const initialWidth = Math.floor(window.innerWidth * 0.6);
-        const initialHeight = Math.floor(window.innerHeight * 0.6);
+        // Set initial size of viewport
+        const initialWidth = Math.floor(window.innerWidth * 0.55);
+        const initialHeight = Math.floor(window.innerHeight * 0.65);
 
         this.container.style.width = initialWidth + "px";
         this.container.style.height = initialHeight + "px";
@@ -237,23 +325,15 @@ class HTMLPopup {
         this.content.style.display = "block";
         this.collapseBtn.innerHTML = "&#x25B2;";
         this._originalSize = null; // Reset original size
+
+        // Bring to front
+        this.windowManager.setActivePopup(this);
         return this;
     }
 
-    // Add method to update title if node changes
-    updateTitle() {
-        if (this.sourceNode) {
-            const nodeTitle = this.sourceNode.title || this.sourceNode.type || "HTML Display Node";
-            const nodeId = this.sourceNode.id || "Unknown";
-            this.title.textContent = `${nodeTitle} (ID: ${nodeId})`;
-        }
-    }
-
     // Show popup with URL content using iframe
-    showUrl(url, title = "Web Content", sourceNode = null) {
-        this.sourceNode = sourceNode;
+    showUrl(url, title = "Web Content") {
         this.title.textContent = title;
-
         // Remove padding from content area when showing iframe
         this.content.style.padding = "0";
 
@@ -300,9 +380,9 @@ class HTMLPopup {
         this.container.style.left = "50%";
         this.container.style.transform = "translate(-50%, -50%)";
 
-        // Set initial size to 60% of viewport
-        const initialWidth = Math.floor(window.innerWidth * 0.6);
-        const initialHeight = Math.floor(window.innerHeight * 0.6);
+        // Set initial size of viewport
+        const initialWidth = Math.floor(window.innerWidth * 0.55);
+        const initialHeight = Math.floor(window.innerHeight * 0.65);
 
         this.container.style.width = initialWidth + "px";
         this.container.style.height = initialHeight + "px";
@@ -312,10 +392,12 @@ class HTMLPopup {
         this.content.style.display = "block";
         this.collapseBtn.innerHTML = "&#x25B2;";
         this._originalSize = null;
+
+        this.windowManager.setActivePopup(this);
         return this;
     }
 
-    // Add this helper method to the HTMLPopup class
+    // Convert URLs to embeddable format
     convertToEmbeddableUrl(url) {
         // YouTube URL patterns to convert
         const youtubePatterns = [
@@ -324,12 +406,10 @@ class HTMLPopup {
             /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]+)/
         ];
 
-        // Check if it's a YouTube URL
         for (const pattern of youtubePatterns) {
             const match = url.match(pattern);
             if (match) {
-                const videoId = match[1];
-                return `https://www.youtube.com/embed/${videoId}`;
+                return `https://www.youtube.com/embed/${match[1]}`;
             }
         }
 
@@ -351,7 +431,23 @@ class HTMLPopup {
         return this;
     }
 
-    // Collapse/expand content
+    // Destroy popup completely
+    destroy() {
+        // Stop any iframes/videos
+        this.htmlContainer.innerHTML = "";
+
+        // Remove resize observer
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+
+        // Remove from DOM
+        if (this.container.parentNode) {
+            this.container.parentNode.removeChild(this.container);
+        }
+    }
+
+    // Rest of your methods (toggleCollapse, updateSize, makeDraggable) stay the same...
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         if (this.collapsed) {
@@ -362,11 +458,11 @@ class HTMLPopup {
             const heightToSave = this._originalSize ? this._originalSize.height + "px" : currentHeight;
             const widthToSave = this._originalSize ? this._originalSize.width + "px" : currentWidth;
 
-            this._preCollapse = {
-                height: heightToSave,
+            this._preCollapse = { 
+                height: heightToSave, 
                 width: widthToSave
             };
-
+            
             this.content.style.display = "none";
             this.collapseBtn.innerHTML = "&#x25BC;"; // Down triangle
             this.container.style.height = this.header.offsetHeight + "px";
@@ -391,28 +487,6 @@ class HTMLPopup {
 
         // Immediately check bounds after collapse/expand
         this.updateSize();
-    }
-
-    // Position near a node (removes centering transform)
-    positionNearNode(node) {
-        if (!node || !window.app || !app.canvas) return this;
-
-        // Get node position in canvas coordinates
-        const nodePos = node.pos || [0, 0];
-        const scale = app.canvas.ds ? app.canvas.ds.scale : 1;
-        const offset = app.canvas.ds ? app.canvas.ds.offset : [0, 0];
-
-        // Convert to screen coordinates
-        const canvasRect = app.canvas.canvas.getBoundingClientRect();
-        const x = canvasRect.left + nodePos[0] * scale + offset[0];
-        const y = canvasRect.top + nodePos[1] * scale + offset[1];
-
-        // Position popup
-        this.container.style.transform = "none";
-        this.container.style.top = y + "px";
-        this.container.style.left = (x + 20) + "px";
-        this.updateSize();
-        return this;
     }
 
     // Update size based on bounds
@@ -516,4 +590,13 @@ class HTMLPopup {
     }
 }
 
-export const htmlPopup = new HTMLPopup();
+// Create the window manager instance
+const windowManager = new PopupWindowManager();
+
+// Cleanup orphaned popups periodically
+setInterval(() => {
+    windowManager.cleanupOrphanedPopups();
+}, 2000);
+
+export { windowManager };
+

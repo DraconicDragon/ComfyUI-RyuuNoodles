@@ -464,12 +464,20 @@ class HTMLPopup {
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         if (this.collapsed) {
-            // When collapsing, DON'T save current size if we're out of bounds
-            // Let the OOB logic handle width restoration
+            // Save current dimensions before collapsing
             const currentHeight = this.container.style.height || this.container.offsetHeight + "px";
             const currentWidth = this.container.style.width || this.container.offsetWidth + "px";
 
-            // Only save the "real" size, not the OOB-shrunk size
+            // Always maintain _originalSize if we're in OOB mode
+            if (!this._originalSize) {
+                // If not in OOB mode, save current dimensions
+                this._originalSize = {
+                    width: parseInt(currentWidth),
+                    height: parseInt(currentHeight)
+                };
+            }
+
+            // Always use _originalSize for width/height when available
             const heightToSave = this._originalSize ? this._originalSize.height + "px" : currentHeight;
             const widthToSave = this._originalSize ? this._originalSize.width + "px" : currentWidth;
 
@@ -496,13 +504,11 @@ class HTMLPopup {
             // Re-enable both horizontal and vertical resizing
             this.container.style.resize = "both";
 
-            // Clear the original size since we're restoring to the intended size
-            this._originalSize = null;
+            // Don't clear _originalSize here - we may still need it
+            // Only updateSize() should modify _originalSize
         }
 
-
-        // IMPORTANT: Don't call updateSize() here when collapsing
-        // Only call it when expanding to check bounds
+        // Only call updateSize when expanding to check bounds
         if (!this.collapsed) {
             this.updateSize();
         }

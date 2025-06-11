@@ -27,6 +27,42 @@ class HTMLPopup {
             resize: "both",
         });
 
+        // Mobile-specific styles
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            // Increase minimum sizes for mobile
+            this.container.style.minWidth = "280px";
+            this.container.style.minHeight = "120px";
+
+            // Make buttons larger for touch
+            Object.assign(this.collapseBtn.style, {
+                padding: "0 16px",
+                fontSize: "18px"
+            });
+
+            Object.assign(this.closeBtn.style, {
+                padding: "0 16px",
+                fontSize: "24px"
+            });
+
+            // Increase header height for easier touch interaction
+            this.updateHeaderStyle = (focused) => {
+                const backgroundColor = focused ? "#333" : "#2a2a2a";
+                const borderColor = focused ? "#444" : "#333";
+
+                Object.assign(this.header.style, {
+                    padding: "0",
+                    backgroundColor: backgroundColor,
+                    borderBottom: `1px solid ${borderColor}`,
+                    display: "flex",
+                    alignItems: "stretch",
+                    cursor: "move",
+                    userSelect: "none",
+                    height: "44px", // Larger height for mobile
+                    minHeight: "44px"
+                });
+            };
+        }
+
         // Add click handler to bring popup to front
         this.container.addEventListener('mousedown', () => {
             this.windowManager.setActivePopup(this);
@@ -213,6 +249,26 @@ class HTMLPopup {
                 document.addEventListener('mouseup', enablePointerEvents);
             }
         });
+
+        // Mobile-friendly resize and drag detection
+        this.container.addEventListener('touchstart', (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const touch = e.touches[0];
+            const isHeaderDrag = touch.clientY <= rect.top + 32;
+            const isResize = touch.clientX >= rect.right - 30 && touch.clientY >= rect.bottom - 30; // Larger touch area
+
+            if (isHeaderDrag || isResize) {
+                // Disable pointer events on content during interaction
+                this.content.style.pointerEvents = 'none';
+
+                const enablePointerEvents = () => {
+                    this.content.style.pointerEvents = 'auto';
+                    document.removeEventListener('touchend', enablePointerEvents);
+                };
+
+                document.addEventListener('touchend', enablePointerEvents);
+            }
+        }, { passive: false });
     }
 
     // Update header style based on focus state
@@ -404,6 +460,7 @@ class HTMLPopup {
         }
     }
 
+    // Rest of your methods (toggleCollapse, updateSize, makeDraggable) stay the same...
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         if (this.collapsed) {
@@ -505,44 +562,79 @@ class HTMLPopup {
         }, 0);
     }
 
-    // Make the popup draggable with boundary constraints
+    // Make the popup draggable with boundary constraints (desktop + mobile)
     makeDraggable() {
         let offsetX, offsetY, isDragging = false;
 
-        this.header.onmousedown = (e) => {
+        // Helper function to get coordinates from mouse or touch event
+        const getEventCoords = (e) => {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        };
+
+        const startDrag = (e) => {
             if (e.target === this.closeBtn || e.target === this.collapseBtn) return;
 
+            e.preventDefault(); // Prevent default touch behavior
             isDragging = true;
-            offsetX = e.clientX - this.container.getBoundingClientRect().left;
-            offsetY = e.clientY - this.container.getBoundingClientRect().top;
 
-            document.onmousemove = (e) => {
-                if (!isDragging) return;
-
-                const padding = 8;
-                const minWidth = parseInt(this.container.style.minWidth) || 400;
-                const minHeight = parseInt(this.container.style.minHeight) || 40;
-
-                let newLeft = e.clientX - offsetX;
-                let newTop = e.clientY - offsetY;
-
-                // Constrain to viewport bounds
-                newLeft = Math.max(padding, Math.min(newLeft, window.innerWidth - minWidth - padding));
-                newTop = Math.max(padding, Math.min(newTop, window.innerHeight - minHeight - padding));
-
-                this.container.style.left = newLeft + "px";
-                this.container.style.top = newTop + "px";
-                this.container.style.transform = "none";
-
-                this.updateSize();
-            };
-
-            document.onmouseup = () => {
-                isDragging = false;
-                document.onmousemove = null;
-                document.onmouseup = null;
-            };
+            const coords = getEventCoords(e);
+            const rect = this.container.getBoundingClientRect();
+            offsetX = coords.x - rect.left;
+            offsetY = coords.y - rect.top;
         };
+
+        const moveDrag = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const coords = getEventCoords(e);
+            const padding = 8;
+            const minWidth = parseInt(this.container.style.minWidth) || 200;
+            const minHeight = parseInt(this.container.style.minHeight) || 40;
+
+            let newLeft = coords.x - offsetX;
+            let newTop = coords.y - offsetY;
+
+            // Constrain to viewport bounds
+            newLeft = Math.max(padding, Math.min(newLeft, window.innerWidth - minWidth - padding));
+            newTop = Math.max(padding, Math.min(newTop, window.innerHeight - minHeight - padding));
+
+            this.container.style.left = newLeft + "px";
+            this.container.style.top = newTop + "px";
+            this.container.style.transform = "none";
+
+            this.updateSize();
+        };
+
+        const endDrag = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            document.removeEventListener('mousemove', moveDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', moveDrag);
+            document.removeEventListener('touchend', endDrag);
+        };
+
+        // Mouse events
+        this.header.addEventListener('mousedown', startDrag);
+
+        // Touch events
+        this.header.addEventListener('touchstart', startDrag, { passive: false });
+
+        // Global move and end events (added when dragging starts)
+        const addGlobalListeners = () => {
+            document.addEventListener('mousemove', moveDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', moveDrag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+        };
+
+        // Add global listeners when drag starts
+        this.header.addEventListener('mousedown', addGlobalListeners);
+        this.header.addEventListener('touchstart', addGlobalListeners);
     }
 }
 

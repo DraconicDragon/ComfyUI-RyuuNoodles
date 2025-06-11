@@ -17,7 +17,7 @@ class HTMLPopup {
             boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
             zIndex: "10000", // 1000 is below horizontal bar
             minWidth: "200px",
-            minHeight: "150px",
+            minHeight: "40px",
             maxWidth: "90vw",
             maxHeight: "90vh",
             display: "flex",
@@ -34,6 +34,7 @@ class HTMLPopup {
 
         // Create header (draggable area + collapse + title + close button)
         this.header = document.createElement("div");
+        this.header.className = "header"; // Add class for drag detection
         this.updateHeaderStyle(true); // Start focused
         this.container.appendChild(this.header);
 
@@ -125,29 +126,32 @@ class HTMLPopup {
             scrollbarColor: "#666 #333"
         });
 
-        // Add scrollbar styles for webkit browsers
-        const style = document.createElement('style');
-        style.textContent = `
-            .ryuu-popup-content::-webkit-scrollbar {
-                width: 8px;
-            }
-            .ryuu-popup-content::-webkit-scrollbar-track {
-                background: #333;
-            }
-            .ryuu-popup-content::-webkit-scrollbar-thumb {
-                background: #666;
-                border-radius: 4px;
-            }
-            .ryuu-popup-content::-webkit-scrollbar-thumb:hover {
-                background: #888;
-            }
-        `;
-        document.head.appendChild(style);
-        this.content.className = "ryuu-popup-content";
+        // Add scrollbar styles for webkit browsers only once
+        if (!document.getElementById('ryuu-popup-scrollbar-style')) {
+            const style = document.createElement('style');
+            style.id = 'ryuu-popup-scrollbar-style';
+            style.textContent = `
+                .ryuu-popup-content::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .ryuu-popup-content::-webkit-scrollbar-track {
+                    background: #333;
+                }
+                .ryuu-popup-content::-webkit-scrollbar-thumb {
+                    background: #666;
+                    border-radius: 4px;
+                }
+                .ryuu-popup-content::-webkit-scrollbar-thumb:hover {
+                    background: #888;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        //this.content.className = "ryuu-popup-content";
 
-        // Create shadow DOM for CSS isolation
+        //// Create shadow DOM for CSS isolation
         if (this.content.attachShadow) {
-            this.shadowRoot = this.content.attachShadow({ mode: 'closed' });
+            this.shadowRoot = this.content.attachShadow({ mode: 'open' }); // set to closed if issues arise
             this.htmlContainer = document.createElement('div');
             Object.assign(this.htmlContainer.style, {
                 color: "#eee",
@@ -447,7 +451,7 @@ class HTMLPopup {
         this._isOOBResizing = true; // SET FLAG BEFORE RESIZING
 
         const rect = this.container.getBoundingClientRect();
-        const minWidth = parseInt(this.container.style.minWidth) || 400;
+        const minWidth = parseInt(this.container.style.minWidth) || 200;
         const minHeight = parseInt(this.container.style.minHeight) || 40;
         const padding = 8;
 

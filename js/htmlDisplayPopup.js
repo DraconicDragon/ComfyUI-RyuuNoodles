@@ -1,8 +1,8 @@
 import { app } from "../../scripts/app.js";
-import { windowManager } from "./ryuu_popup.js";
+import { windowManager } from "./ryuuPopupWindowManager.js";
 
 app.registerExtension({
-    name: "RyuuNoodles.HTMLDisplayNode",
+    name: "RyuuNoodles.HTMLDisplayPopup",
     async beforeRegisterNodeDef(nodeType, nodeData) {
         if (nodeData.name !== "Ryuu_HTMLDisplayNode") return;
 

@@ -404,7 +404,6 @@ class HTMLPopup {
         }
     }
 
-    // Rest of your methods (toggleCollapse, updateSize, makeDraggable) stay the same...
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         if (this.collapsed) {

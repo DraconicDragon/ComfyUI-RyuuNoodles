@@ -225,8 +225,8 @@ class HTMLPopup {
                 const currentWidth = this.container.offsetWidth + "px";
                 this._preCollapse.width = currentWidth;
 
-                // Clear _originalSize to prevent it from overriding manual resize
-                this._originalSize = null;
+                // DON'T clear _originalSize here - let OOB logic handle it
+                // this._originalSize = null;
             }
         });
         this.resizeObserver.observe(this.container);
@@ -464,10 +464,12 @@ class HTMLPopup {
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         if (this.collapsed) {
-            // Save current dimensions, but use original dimensions if we're currently out of bounds
+            // When collapsing, DON'T save current size if we're out of bounds
+            // Let the OOB logic handle width restoration
             const currentHeight = this.container.style.height || this.container.offsetHeight + "px";
             const currentWidth = this.container.style.width || this.container.offsetWidth + "px";
 
+            // Only save the "real" size, not the OOB-shrunk size
             const heightToSave = this._originalSize ? this._originalSize.height + "px" : currentHeight;
             const widthToSave = this._originalSize ? this._originalSize.width + "px" : currentWidth;
 
@@ -498,8 +500,12 @@ class HTMLPopup {
             this._originalSize = null;
         }
 
-        // Immediately check bounds after collapse/expand
-        this.updateSize();
+
+        // IMPORTANT: Don't call updateSize() here when collapsing
+        // Only call it when expanding to check bounds
+        if (!this.collapsed) {
+            this.updateSize();
+        }
     }
 
     // Update size based on bounds
@@ -512,49 +518,32 @@ class HTMLPopup {
         const padding = 8;
 
         let left = rect.left, top = rect.top;
-        let width = rect.width, height = rect.height;
+        let currentWidth = rect.width, currentHeight = rect.height;
 
-        // Save original size when first going out of bounds
-        const isOutOfBoundsRight = left + width > window.innerWidth - padding;
-        const isOutOfBoundsBottom = top + height > window.innerHeight - padding;
-
-        if ((isOutOfBoundsRight || (!this.collapsed && isOutOfBoundsBottom)) && !this._originalSize) {
-            this._originalSize = { width, height };
+        // If _originalSize is not set, cache the current dimensions.
+        if (!this._originalSize) {
+            this._originalSize = { width: currentWidth, height: currentHeight };
         }
 
         // Calculate available space
         const availableWidth = window.innerWidth - left - padding;
         const availableHeight = window.innerHeight - top - padding;
 
-        // If we have original size and there's more space available, grow towards original
-        if (this._originalSize) {
-            if (availableWidth >= this._originalSize.width && (!this.collapsed && availableHeight >= this._originalSize.height)) {
-                // Full space available, restore original size
-                width = this._originalSize.width;
-                if (!this.collapsed) {
-                    height = this._originalSize.height;
-                }
-                this._originalSize = null;
-            } else {
-                // Partial space, grow as much as possible towards original
-                width = Math.min(this._originalSize.width, Math.max(minWidth, availableWidth));
-                if (!this.collapsed) {
-                    height = Math.min(this._originalSize.height, Math.max(minHeight, availableHeight));
-                }
-            }
-        } else {
-            // Shrink if out of bounds
-            if (isOutOfBoundsRight) {
-                width = Math.max(minWidth, availableWidth);
-            }
-            if (!this.collapsed && isOutOfBoundsBottom) {
-                height = Math.max(minHeight, availableHeight);
-            }
+        // Always restore width using the original value regardless of collapse:
+        let newWidth = Math.min(this._originalSize.width, Math.max(minWidth, availableWidth));
+
+        // For height, if collapsed keep header height, else restore normally.
+        let newHeight = this.collapsed ? this.header.offsetHeight
+            : Math.min(this._originalSize.height, Math.max(minHeight, availableHeight));
+
+        // If enough space is available, clear _originalSize.
+        if (availableWidth >= this._originalSize.width && (!this.collapsed && availableHeight >= this._originalSize.height)) {
+            this._originalSize = null;
         }
 
         // Apply size
-        this.container.style.width = width + "px";
-        this.container.style.height = height + "px";
+        this.container.style.width = newWidth + "px";
+        this.container.style.height = newHeight + "px";
 
         // Use setTimeout to clear flag after the resize has been applied
         setTimeout(() => {

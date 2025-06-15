@@ -28,6 +28,13 @@ You can find the settings the custom node pack adds here as well as the defaults
 - **Default Value**: `1000`
 - **Tooltip**: Default: 1000 Suggested to stay above 200ms.
 
+## Token Count Overlay > Support 'BREAK' keyword
+
+- **ID**: `RyuuSettings.TokenCountOverlay.SupportBreakKeyword`
+- **Type**: boolean
+- **Default Value**: `false`
+- **Tooltip**: This will simply increase the CLIP-L counter number to fill up to the next upper multiple of 75 when 'BREAK' is encountered in the text. NOTE: ComfyUI by default doesn't support 'BREAK' and you need to use a custom node for the actual functionality.
+
 ## Token Count Overlay > Include special tokens
 
 - **ID**: `RyuuSettings.TokenizerAddSpecialTokens`

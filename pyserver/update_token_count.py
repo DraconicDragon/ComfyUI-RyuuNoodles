@@ -109,6 +109,32 @@ def strip_weighting(text):
     return text
 
 
+def handle_clip_l_breaks(text, tokenizer, add_special_tokens=False):
+    """Handle BREAK keywords for CLIP-L tokenizer with 75-token chunking"""
+    if "BREAK" not in text:
+        # No BREAK found, tokenize normally
+        outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
+        return outputs["input_ids"].shape[1]
+
+    # Split text by BREAK and process each chunk
+    # Handles BREAK at start, end, or surrounded by any whitespace
+    chunks = re.split(r"(?<!\w)BREAK(?!\w)", text)
+    total_tokens = 0
+
+    for i, chunk in enumerate(chunks):
+        # Tokenize the current chunk
+        outputs = tokenizer(chunk, return_tensors="pt", add_special_tokens=add_special_tokens)
+        chunk_tokens = outputs["input_ids"].shape[1]
+
+        # For all but the last chunk, always count as a full 75-token chunk
+        if i < len(chunks) - 1:
+            total_tokens += 75
+        else:
+            total_tokens += chunk_tokens
+
+    return total_tokens
+
+
 @routes.post("/ryuu/update_token_count")
 async def update_token_count(request):
     try:
@@ -136,14 +162,21 @@ async def update_token_count(request):
                 tokens_map[name] = []
             continue
 
-        # run the tokenizer
-        outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
-        num = outputs["input_ids"].shape[1]
+        # Special handling for CLIP-L tokenizer with BREAK keywords
+        if name.lower().strip() == "clip_l" and data.get("support_break_keyword", False):
+            num = handle_clip_l_breaks(text, tokenizer, add_special_tokens)
+        else:
+            # Standard tokenization for other tokenizers
+            outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
+            num = outputs["input_ids"].shape[1]
+
         token_counts[name] = num
 
         if INCLUDE_TOKENS:
             # return the raw token strings too
             # NOTE: unused in JS currently
+            # For CLIP-L with BREAK, this won't show the padding tokens, just the actual text tokens
+            outputs = tokenizer(text.replace("BREAK", ""), return_tensors="pt", add_special_tokens=add_special_tokens)
             ids = outputs["input_ids"][0]
             tokens_map[name] = [tokenizer.convert_ids_to_tokens(int(t)) for t in ids]
 

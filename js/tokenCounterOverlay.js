@@ -46,6 +46,7 @@ async function updateTokenCount(node) {
 
     const rawSettingsString = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay") || "";
     const addSpecialTokens = app.extensionManager.setting.get("RyuuSettings.TokenizerAddSpecialTokens") || false;
+    const SupportBreakKeyword = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.SupportBreakKeyword") || false;
     const mapping = parseSettingsString(rawSettingsString);
     const mapConfig = mapping[node._mapConfigName];
 
@@ -69,6 +70,7 @@ async function updateTokenCount(node) {
                 text: inputText,
                 tok_types: mapConfig.tok_types,
                 add_special_tokens: addSpecialTokens,
+                support_break_keyword: SupportBreakKeyword,
             }),
         });
 

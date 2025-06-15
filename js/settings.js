@@ -19,6 +19,20 @@ app.registerExtension({
         },
 
         {
+            id: "RyuuSettings.TokenCountOverlay.SupportBreakKeyword",
+            category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Support "BREAK" for CLIP-L'],
+            name: "Support 'BREAK' keyword",
+            type: "boolean",
+            defaultValue: false,
+            tooltip: "This will simply increase the CLIP-L counter number to fill up to the next upper multiple of 75 " +
+                "when 'BREAK' is encountered in the text. NOTE: ComfyUI by default doesn't support 'BREAK' " + 
+                "and you need to use a custom node for the actual functionality.",
+            onChange: (newVal, oldVal) => {
+                console.log(`RyuuSettings.TokenCountOverlay.SupportBreakKeyword has been changed from ${oldVal} to ${newVal}`);
+            },
+        },
+
+        {
             id: "RyuuSettings.TokenCountOverlay.UpdateInterval",
             category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Update Interval'],
             name: "Update Interval in ms",

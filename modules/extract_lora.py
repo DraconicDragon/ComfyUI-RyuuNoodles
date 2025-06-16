@@ -232,7 +232,7 @@ class ExtractAndSaveLora:
         bias_diff,
         skip_on_any_diff_zero,
         skip_on_proj_diff_zero,
-        save_workflow,
+        embed_workflow,
         # optional
         model_diff=None,
         text_encoder_diff=None,

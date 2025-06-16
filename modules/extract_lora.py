@@ -1,15 +1,25 @@
+import json
 import os
 from enum import Enum
 
-import torch
+import torch  # type: ignore
 
-import comfy.model_management
-import comfy.utils
-import folder_paths
+import comfy.model_management  # type: ignore
+import comfy.utils  # type: ignore
+import folder_paths  # type: ignore
+from comfy.cli_args import args  # type: ignore
 
 from ..modules.shared.ryuu_log import ryuu_log
 
 CLAMP_QUANTILE = 0.99
+
+
+class LORAType(Enum):
+    STANDARD = 0
+    FULL_DIFF = 1
+
+
+LORA_TYPES = {"standard": LORAType.STANDARD, "full_diff": LORAType.FULL_DIFF}
 
 
 def extract_lora(diff, rank):
@@ -41,14 +51,6 @@ def extract_lora(diff, rank):
         U = U.reshape(out_dim, rank, 1, 1)
         Vh = Vh.reshape(rank, in_dim, kernel_size[0], kernel_size[1])
     return (U, Vh)
-
-
-class LORAType(Enum):
-    STANDARD = 0
-    FULL_DIFF = 1
-
-
-LORA_TYPES = {"standard": LORAType.STANDARD, "full_diff": LORAType.FULL_DIFF}
 
 
 def _check_text_encoder_diff(text_encoder_diff):
@@ -117,22 +119,92 @@ class ExtractAndSaveLora:
         return {
             "required": {
                 "filename_prefix": ("STRING", {"default": "loras/ComfyUI_extracted_lora"}),
-                "rank": ("INT", {"default": 8, "min": 1, "max": 4096, "step": 1}),
-                "lora_type": (tuple(LORA_TYPES.keys()),),
-                "bias_diff": ("BOOLEAN", {"default": True}),
+                "filename_suffix": (
+                    "STRING",
+                    {
+                        "default": "{counter:05}",
+                        "tooltip": (
+                            "Suffix to append to the filename. Will be appended after '_noTE', '_biasdiff', etc. "
+                            "Use {counter} for a counter, it supports zero padding (E.g.: test_{counter:05}_ = test_00001_)."
+                        ),
+                    },
+                ),
+                "rank": (
+                    "INT",
+                    {
+                        "default": 16,
+                        "min": 1,
+                        "max": 4096,
+                        "step": 1,
+                        "tooltip": (
+                            "LoRA network dimension size (LoRA Rank). "
+                            "Prefer 16-64 depending on how much data you want to have "
+                            "saved in relation to the checkpoint differences."
+                        ),
+                    },
+                ),
+                "lora_type": (
+                    tuple(LORA_TYPES.keys()),
+                    {
+                        "tooltip": (
+                            "Type of LoRA to extract. Standard is the default "
+                            "(like normal trained LoRA; rank 32 ~= 217mb LoRA assuming TE diff is extracted too), "
+                            "full_diff saves the full weight diff (very large)."
+                        ),
+                    },
+                ),
+                "bias_diff": (
+                    "BOOLEAN",
+                    {
+                        "default": True,
+                        "tooltip": (
+                            "If enabled, includes .bias weight differences in the extracted LoRA. "
+                            "This can help match the original model behavior more closely, with minimal impact on file size."
+                        ),
+                    },
+                ),
                 "skip_on_any_diff_zero": (
                     "BOOLEAN",
-                    {"default": False, "tooltip": "Skip text encoder if any weight diff is zero"},
+                    {
+                        "default": True,
+                        "tooltip": ("If True, skips saving the text encoder weights if any weight diff is zero."),
+                    },
                 ),
                 "skip_on_proj_diff_zero": (
                     "BOOLEAN",
-                    {"default": False, "tooltip": "Skip text encoder if text_projection.weight diff is zero"},
+                    {
+                        "default": True,
+                        "tooltip": (
+                            "If True, skips saving the text encoder weights if 'text_projection.weight' diff is zero."
+                        ),
+                    },
+                ),
+                "embed_workflow": (
+                    "BOOLEAN",
+                    {
+                        "default": True,
+                        "tooltip": (
+                            "Enable or disable saving of workflow inside the LoRA metadata. "
+                            "Will not save metadata if it's disabled in ComfyUI globally."
+                        ),
+                    },
                 ),
             },
             "optional": {
-                "model_diff": ("MODEL", {"tooltip": "The ModelSubtract output to be converted to a lora."}),
-                "text_encoder_diff": ("CLIP", {"tooltip": "The CLIPSubtract output to be converted to a lora."}),
+                "model_diff": (
+                    "MODEL",
+                    {
+                        "tooltip": ("The ModelSubtract output to be converted to a lora."),
+                    },
+                ),
+                "text_encoder_diff": (
+                    "CLIP",
+                    {
+                        "tooltip": ("The CLIPSubtract output to be converted to a lora."),
+                    },
+                ),
             },
+            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
 
     RETURN_TYPES = ()
@@ -141,22 +213,32 @@ class ExtractAndSaveLora:
     EXPERIMENTAL = True
     CATEGORY = "RyuuNoodles 🐲/Utils"
     DESCRIPTION = (
-        "Saves the model and text encoder diffs as LoRA weights. \n"
+        "Saves the model and text encoder diffs as LoRA weights in .safetensors format. \n"
         "How is this different from the built-in Extract and Save LoRA node? \n"
-        "This one allows you choose not to save text encoder weights if any text encoder key difference is 0 \n"
-        "or if the sepcific *.transformers.text_projection.weight key is 0."
+        "This one allows you choose not to save text encoder weights if any text encoder key difference is 0 "
+        "or if the sepcific *.transformers.text_projection.weight key is 0. \n"
+        "It also allows you to choose file suffix, and adds keywords to the "
+        "filename like r40 to indicate rank size, _TE / _noTE to indicate if the text encoder diff was included, and "
+        "_biasdiff to indicate that bias differences were included.\n"
+        "Workflow can also be saved by embedding it into the LoRA's metadata."
     )
 
     def extract_and_save(
         self,
         filename_prefix,
+        filename_suffix,
         rank,
         lora_type,
         bias_diff,
         skip_on_any_diff_zero,
         skip_on_proj_diff_zero,
+        save_workflow,
+        # optional
         model_diff=None,
         text_encoder_diff=None,
+        # hidden, for metadata saving
+        prompt=None,
+        extra_pnginfo=None,
     ):
         if model_diff is None and text_encoder_diff is None:
             return {}
@@ -174,6 +256,7 @@ class ExtractAndSaveLora:
             )
 
         # Process text encoder diffs with skip logic
+        has_te_diff = False
         if text_encoder_diff is not None:
             any_zero, proj_zero = _check_text_encoder_diff(text_encoder_diff)
             skip = (skip_on_any_diff_zero and any_zero) or (skip_on_proj_diff_zero and proj_zero)
@@ -185,11 +268,38 @@ class ExtractAndSaveLora:
                 )
             else:
                 output_sd = calc_lora_model(
-                    text_encoder_diff.patcher, rank, "", "text_encoders.", output_sd, lora_type, bias_diff=bias_diff
+                    text_encoder_diff.patcher,
+                    rank,
+                    "",
+                    "text_encoders.",
+                    output_sd,
+                    lora_type,
+                    bias_diff=bias_diff,
                 )
+                has_te_diff = True
 
-        output_checkpoint = f"{filename}_{counter:05}_.safetensors"
+        # check if extracted lora has text encoder diff in it or biasdiff enabled
+        has_te = "_TE" if has_te_diff else "_noTE"
+        has_biasdiff = "_biasdiff" if bias_diff else "_nobiasdiff"
+
+        # region metadata
+        prompt_info = ""
+        if prompt is not None:
+            prompt_info = json.dumps(prompt)
+
+        metadata = {}
+        if not args.disable_metadata and save_workflow:
+            metadata["prompt"] = prompt_info
+            if extra_pnginfo is not None:
+                for x in extra_pnginfo:
+                    metadata[x] = json.dumps(extra_pnginfo[x])
+        # endregion
+
+        formatted_suffix = filename_suffix.format(counter=counter)
+        formatted_suffix = f"_{formatted_suffix}" if (not filename_suffix == "") else ""
+
+        output_checkpoint = f"{filename}_r{rank}{has_te}{has_biasdiff}{formatted_suffix}.safetensors"
         output_checkpoint = os.path.join(full_output_folder, output_checkpoint)
 
-        comfy.utils.save_torch_file(output_sd, output_checkpoint, metadata=None)
+        comfy.utils.save_torch_file(output_sd, output_checkpoint, metadata=metadata)
         return {}

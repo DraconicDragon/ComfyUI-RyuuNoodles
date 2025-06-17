@@ -166,14 +166,14 @@ class ExtractAndSaveLora:
                 "skip_on_any_diff_zero": (
                     "BOOLEAN",
                     {
-                        "default": True,
+                        "default": False,
                         "tooltip": ("If True, skips saving the text encoder weights if any weight diff is zero."),
                     },
                 ),
                 "skip_on_proj_diff_zero": (
                     "BOOLEAN",
                     {
-                        "default": True,
+                        "default": False,
                         "tooltip": (
                             "If True, skips saving the text encoder weights if 'text_projection.weight' diff is zero."
                         ),
@@ -288,7 +288,7 @@ class ExtractAndSaveLora:
             prompt_info = json.dumps(prompt)
 
         metadata = {}
-        if not args.disable_metadata and save_workflow:
+        if not args.disable_metadata and embed_workflow:
             metadata["prompt"] = prompt_info
             if extra_pnginfo is not None:
                 for x in extra_pnginfo:

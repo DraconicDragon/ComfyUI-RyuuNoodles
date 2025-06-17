@@ -220,7 +220,9 @@ class ExtractAndSaveLora:
         "It also allows you to choose file suffix, and adds keywords to the "
         "filename like r40 to indicate rank size, _TE / _noTE to indicate if the text encoder diff was included, and "
         "_biasdiff to indicate that bias differences were included.\n"
-        "Workflow can also be saved by embedding it into the LoRA's metadata."
+        "Workflow can also be saved by embedding it into the LoRA's metadata.\n\n"
+        "It's possible this node doesn't quite work for the TE saving and all that, "
+        "I've had unexpectedly mixed result for the same extracts when there shouldn't have been any nuance."
     )
 
     def extract_and_save(

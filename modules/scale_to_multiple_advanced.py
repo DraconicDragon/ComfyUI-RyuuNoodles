@@ -91,21 +91,23 @@ class ScaleToMultipleAdvanced:
                         ),
                     },
                 ),
-                # "resize_mode": (
-                #     ["nearest", "linear", "bilinear", "bicubic", "trilinear", "area"],
-                #     {
-                #         "default": "bilinear",
-                #         "tooltip": (
-                #             "Resize mode for the image. \n"
-                #             "'nearest' will use nearest neighbor interpolation.\n"
-                #             "'linear' will use linear interpolation.\n"
-                #             "'bilinear' will use bilinear interpolation.\n"
-                #             "'bicubic' will use bicubic interpolation.\n"
-                #             "'trilinear' will use trilinear interpolation.\n"
-                #             "'area' will use area interpolation.\n"
-                #         ),
-                #     },
-                # ),
+                "resize_mode": (
+                    [
+                        "lanczos",
+                        "nearest",
+                        "bilinear",
+                        "bicubic",
+                        "box",
+                        "hamming",
+                        "bilinear - tensor",
+                    ],
+                    {
+                        "default": "bilinear",
+                        "tooltip": (
+                            "Resize mode for the image."
+                        ),
+                    },
+                ),
             },
         }
 
@@ -137,7 +139,6 @@ class ScaleToMultipleAdvanced:
         try:
             import numpy as np
             from PIL import Image, ImageDraw, ImageFont
-
         except ImportError:
             ryuu_log(
                 "PIL or numpy not found. Cannot create a placeholder image. Returning a black tensor.",
@@ -179,6 +180,36 @@ class ScaleToMultipleAdvanced:
         tensor_image = torch.from_numpy(np_image).unsqueeze(0)
         return tensor_image
 
+    def _pil_resize(self, image, target_h, target_w, mode):
+        import numpy as np
+        from PIL import Image
+
+        mode_map = {
+            "lanczos": Image.Resampling.LANCZOS,
+            "nearest": Image.Resampling.NEAREST,
+            "bilinear": Image.Resampling.BILINEAR,
+            "bicubic": Image.Resampling.BICUBIC,
+            "box": Image.Resampling.BOX,
+            "hamming": Image.Resampling.HAMMING,
+        }
+        resample = mode_map.get(mode, Image.Resampling.BILINEAR)
+        b, h, w, c = image.shape
+        image_np = image.cpu().numpy()
+        out = []
+        for i in range(b):
+            img = (image_np[i] * 255).clip(0, 255).astype(np.uint8)
+            pil_img = Image.fromarray(img)
+            pil_resized = pil_img.resize((target_w, target_h), resample=resample)
+            arr = np.asarray(pil_resized).astype(np.float32) / 255.0
+            out.append(arr)
+        out = np.stack(out, axis=0)
+        return torch.from_numpy(out).to(image.device)
+
+    def _tensor_resize(self, image, target_h, target_w):
+        img_bchw = image.permute(0, 3, 1, 2)
+        resized = F.interpolate(img_bchw, size=(target_h, target_w), mode="bilinear", align_corners=False)
+        return resized.permute(0, 2, 3, 1)
+
     def main_operation(
         self,
         multiple,
@@ -188,7 +219,7 @@ class ScaleToMultipleAdvanced:
         scale_factor_height,
         # decouple_opt_res,
         crop_mode,
-        # resize_mode,
+        resize_mode,
         image=None,
         width=None,
         height=None,
@@ -225,12 +256,21 @@ class ScaleToMultipleAdvanced:
             # No scaling needed
             return (image, final_w, final_h)
 
-        img_bchw = image.permute(0, 3, 1, 2)  # NHWC -> BCHW
+        use_tensor = (resize_mode == "bilinear - tensor")
+        pil_mode = resize_mode if resize_mode != "bilinear - tensor" else "bilinear"
+
+        def resize_func(img, h, w):
+            if use_tensor:
+                return self._tensor_resize(img, h, w)
+            else:
+                return self._pil_resize(img, h, w, pil_mode)
+
+        img_bchw = image.permute(0, 3, 1, 2)  # BHWC -> BCHW
         resized_bchw = None
 
         if crop_mode == "stretch":
-            # Stretch image to fill target size (may distort aspect ratio)
-            resized_bchw = F.interpolate(img_bchw, size=(final_h, final_w), mode="bilinear", align_corners=False)
+            scaled_image = resize_func(image, final_h, final_w)
+            return (scaled_image, final_w, final_h)
         else:
             orig_aspect = orig_w / orig_h
             target_aspect = final_w / final_h
@@ -269,7 +309,8 @@ class ScaleToMultipleAdvanced:
                     )
 
                 resize_w, resize_h = max(1, resize_w), max(1, resize_h)
-                temp_resized = F.interpolate(img_bchw, size=(resize_h, resize_w), mode="bilinear", align_corners=False)
+                temp_resized = resize_func(image, resize_h, resize_w)
+                temp_bchw = temp_resized.permute(0, 3, 1, 2)
 
                 if crop_mode in ["uniform", "uniform fill"]:
                     # Place resized image on black canvas (padding)
@@ -277,12 +318,12 @@ class ScaleToMultipleAdvanced:
                         (img_bchw.shape[0], img_bchw.shape[1], final_h, final_w), device=image.device, dtype=image.dtype
                     )
                     paste_x, paste_y = (final_w - resize_w) // 2, (final_h - resize_h) // 2
-                    canvas[:, :, paste_y : paste_y + resize_h, paste_x : paste_x + resize_w] = temp_resized
+                    canvas[:, :, paste_y : paste_y + resize_h, paste_x : paste_x + resize_w] = temp_bchw
                     resized_bchw = canvas
                 else:  # fill
                     # Crop center region to target size
                     crop_x, crop_y = (resize_w - final_w) // 2, (resize_h - final_h) // 2
-                    resized_bchw = temp_resized[:, :, crop_y : crop_y + final_h, crop_x : crop_x + final_w]
+                    resized_bchw = temp_bchw[:, :, crop_y : crop_y + final_h, crop_x : crop_x + final_w]
 
         scaled_image = resized_bchw.permute(0, 2, 3, 1)  # BCHW -> BHWC
         return (scaled_image, final_w, final_h)

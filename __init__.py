@@ -13,7 +13,7 @@ from .modules.primitive_number_ops import (
     FloatSlider,
     IntSlider,
 )
-from .modules.scale_to_multiple_advanced import ScaleToMultipleAdvanced
+from .modules.scale_to_multiple_advanced import ScaleToMultiple, ScaleToMultipleAdvanced
 from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
 
@@ -37,6 +37,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
     # Experimental Nodes/Utils
     "Ryuu_ScaleToMultipleAdvanced": ScaleToMultipleAdvanced,
+    "Ryuu_ScaleToMultiple": ScaleToMultiple,
     "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
     # String cleaning/stripping nodes
@@ -55,7 +56,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_ColorMatch": "Color Match 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
     # Experimental Nodes/Utils
-    "Ryuu_ScaleToMultiple": "Scale To Multiple Adv. 🐲",
+    "Ryuu_ScaleToMultipleAdvanced": "Scale To Multiple Adv. 🐲",
+    "Ryuu_ScaleToMultiple": "Scale To Multiple 🐲",
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
     "Ryuu_CleanStringAdvanced": "Clean String Adv. 🐲",

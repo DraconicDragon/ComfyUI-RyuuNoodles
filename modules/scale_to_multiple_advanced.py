@@ -6,14 +6,23 @@ import torch.nn.functional as F  # type: ignore
 from ..modules.shared.ryuu_log import ryuu_log
 
 
-class ScaleToMultipleAdvanced:
+class ScaleToMultipleBase:
     """
-    Scales image dimensions and/or integers to a specified multiple, with options for rounding mode and pre-scaling.
+    Base class for scaling image dimensions and/or integers to a specified multiple.
     """
+
+    # May be overridden by child classes
+    ALLOW_SEPARATE_ROUNDING_MODES = False
+    ALLOW_SEPARATE_SCALE_FACTORS = False
+
+    RETURN_TYPES = ("IMAGE", "INT", "INT")
+    RETURN_NAMES = ("scaled_image", "scaled_width", "scaled_height")
+    FUNCTION = "main_operation"
+    CATEGORY = "RyuuNoodles/Utils"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {
+        inputs = {
             "optional": {
                 "image": (
                     "IMAGE",
@@ -58,61 +67,6 @@ class ScaleToMultipleAdvanced:
                         "tooltip": ("Multiple to scale to.\n Setting to 1 effectively disables this."),
                     },
                 ),
-                "rounding_mode_width": (
-                    ["nearest", "floor", "ceil"],
-                    {
-                        "default": "nearest",
-                        "tooltip": (
-                            "Rounding mode for width. "
-                            "'nearest' will round to the nearest multiple of 'multiple' value.\n"
-                            "'floor' will round down to the nearest multiple. \n"
-                            "'ceil' will round up."
-                        ),
-                    },
-                ),
-                "rounding_mode_height": (
-                    ["nearest", "floor", "ceil"],
-                    {
-                        "default": "nearest",
-                        "tooltip": (
-                            "Rounding mode for height. "
-                            "'nearest' will round to the nearest multiple of 'multiple' value.\n"
-                            "'floor' will round down to the nearest multiple. \n"
-                            "'ceil' will round up."
-                        ),
-                    },
-                ),
-                "scale_factor_width": (
-                    "FLOAT",
-                    {
-                        "default": 1.0,
-                        "min": 0.01,
-                        "step": 0.005,
-                        "tooltip": ("How much to multiply width by before scaling to multiple."),
-                    },
-                ),
-                "scale_factor_height": (
-                    "FLOAT",
-                    {
-                        "default": 1.0,
-                        "min": 0.01,
-                        "step": 0.005,
-                        "tooltip": ("How much to multiply height by before scaling to multiple."),
-                    },
-                ),
-                # "img_use_opt_res": (
-                #     "BOOLEAN",
-                #     {
-                #         "default": False,
-                #         "tooltip": (
-                #             "By default the image will be resized by using it's own dimensions (width/height).\n"
-                #             "If this setting is set to 'True' then the image will be resized based on the optional "
-                #             "width and height (so far they are given). In the case where this setting is 'True' "
-                #             "but neither or only one out of the two is given, the missing number will be substituted "
-                #             "using the image's own width and/or height."
-                #         ),
-                #     },
-                # ),
                 "crop_mode": (
                     ["stretch", "center", "fill", "uniform", "uniform fill"],
                     {
@@ -148,22 +102,92 @@ class ScaleToMultipleAdvanced:
                 ),
             },
         }
+        # "img_use_opt_res": (
+        #     "BOOLEAN",
+        #     {
+        #         "default": False,
+        #         "tooltip": (
+        #             "By default the image will be resized by using it's own dimensions (width/height).\n"
+        #             "If this setting is set to 'True' then the image will be resized based on the optional "
+        #             "width and height (so far they are given). In the case where this setting is 'True' "
+        #             "but neither or only one out of the two is given, the missing number will be substituted "
+        #             "using the image's own width and/or height."
+        #         ),
+        #     },
+        # ),
 
-    RETURN_TYPES = ("IMAGE", "INT", "INT")
-    RETURN_NAMES = ("scaled_image", "scaled_width", "scaled_height")
+        # Add rounding mode inputs based on flags
+        if cls.ALLOW_SEPARATE_ROUNDING_MODES:
+            inputs["required"]["rounding_mode_width"] = (
+                ["nearest", "floor", "ceil"],
+                {
+                    "default": "nearest",
+                    "tooltip": (
+                        "Rounding mode for width. "
+                        "'nearest' will round to the nearest multiple of 'multiple' value.\n"
+                        "'floor' will round down to the nearest multiple. \n"
+                        "'ceil' will round up."
+                    ),
+                },
+            )
+            inputs["required"]["rounding_mode_height"] = (
+                ["nearest", "floor", "ceil"],
+                {
+                    "default": "nearest",
+                    "tooltip": (
+                        "Rounding mode for height. "
+                        "'nearest' will round to the nearest multiple of 'multiple' value.\n"
+                        "'floor' will round down to the nearest multiple. \n"
+                        "'ceil' will round up."
+                    ),
+                },
+            )
+        else:
+            inputs["required"]["rounding_mode"] = (
+                ["nearest", "floor", "ceil"],
+                {
+                    "default": "nearest",
+                    "tooltip": (
+                        "Rounding mode for both width and height. "
+                        "'nearest' will round to the nearest multiple of 'multiple' value.\n"
+                        "'floor' will round down to the nearest multiple. \n"
+                        "'ceil' will round up."
+                    ),
+                },
+            )
 
-    FUNCTION = "main_operation"
+        # Add scale factor inputs based on flags
+        if cls.ALLOW_SEPARATE_SCALE_FACTORS:
+            inputs["required"]["scale_factor_width"] = (
+                "FLOAT",
+                {
+                    "default": 1.0,
+                    "min": 0.01,
+                    "step": 0.005,
+                    "tooltip": ("How much to multiply width by before scaling to multiple."),
+                },
+            )
+            inputs["required"]["scale_factor_height"] = (
+                "FLOAT",
+                {
+                    "default": 1.0,
+                    "min": 0.01,
+                    "step": 0.005,
+                    "tooltip": ("How much to multiply height by before scaling to multiple."),
+                },
+            )
+        else:
+            inputs["required"]["scale_factor"] = (
+                "FLOAT",
+                {
+                    "default": 1.0,
+                    "min": 0.01,
+                    "step": 0.005,
+                    "tooltip": ("How much to multiply both width and height by before scaling to multiple."),
+                },
+            )
 
-    EXPERIMENTAL = True
-
-    DESCRIPTION = (
-        "Scales image dimensions and/or integers to a specified multiple, with options for rounding mode and pre-scaling.\n"
-        "If no image is provided, only the width and height will be scaled.\n"
-        "If image and width and/or height is provided, the image will use the "
-        "provided dimension for scaling instead of it's own width/height. This will work as a width/height override."
-    )
-
-    CATEGORY = "RyuuNoodles/Utils"
+        return inputs
 
     def _scale_int(self, val, rounding_mode, scale_factor, multiple):
         # Scale integer value, then round to nearest/floor/ceil multiple
@@ -255,14 +279,13 @@ class ScaleToMultipleAdvanced:
         resized = F.interpolate(img_bchw, size=(target_h, target_w), mode="bilinear", align_corners=False)
         return resized.permute(0, 2, 3, 1)
 
-    def main_operation(
+    def _process_scaling(
         self,
         multiple,
         rounding_mode_width,
         rounding_mode_height,
         scale_factor_width,
         scale_factor_height,
-        # decouple_opt_res,
         crop_mode,
         resize_mode,
         image=None,
@@ -379,3 +402,62 @@ class ScaleToMultipleAdvanced:
 
         scaled_image = resized_bchw.permute(0, 2, 3, 1)  # BCHW -> BHWC
         return (scaled_image, final_w, final_h)
+
+    def main_operation(self, **kwargs):
+        """Main operation that handles parameter extraction based on class flags."""
+        # Extract common parameters
+        image = kwargs.get("image")
+        width = kwargs.get("width")
+        height = kwargs.get("height")
+        multiple = kwargs["multiple"]
+        crop_mode = kwargs["crop_mode"]
+        resize_mode = kwargs["resize_mode"]
+
+        # Extract rounding mode parameters based on flags
+        if self.ALLOW_SEPARATE_ROUNDING_MODES:
+            rounding_mode_width = kwargs["rounding_mode_width"]
+            rounding_mode_height = kwargs["rounding_mode_height"]
+        else:
+            rounding_mode = kwargs["rounding_mode"]
+            rounding_mode_width = rounding_mode_height = rounding_mode
+
+        # Extract scale factor parameters based on flags
+        if self.ALLOW_SEPARATE_SCALE_FACTORS:
+            scale_factor_width = kwargs["scale_factor_width"]
+            scale_factor_height = kwargs["scale_factor_height"]
+        else:
+            scale_factor = kwargs["scale_factor"]
+            scale_factor_width = scale_factor_height = scale_factor
+
+        return self._process_scaling(
+            image,
+            width,
+            height,
+            multiple,
+            rounding_mode_width,
+            rounding_mode_height,
+            scale_factor_width,
+            scale_factor_height,
+            crop_mode,
+            resize_mode,
+        )
+
+
+class ScaleToMultipleAdvanced(ScaleToMultipleBase):
+    """
+    Scales image dimensions and/or integers to a specified multiple, with options for rounding mode and pre-scaling.
+    Advanced version with separate controls for width and height.
+    """
+
+    # Enable advanced features
+    ALLOW_SEPARATE_ROUNDING_MODES = True
+    ALLOW_SEPARATE_SCALE_FACTORS = True
+
+    EXPERIMENTAL = True
+
+    DESCRIPTION = (
+        "Scales image dimensions and/or integers to a specified multiple, with options for rounding mode and pre-scaling.\n"
+        "If no image is provided, only the width and height will be scaled.\n"
+        "If image and width and/or height is provided, the image will use the "
+        "provided dimension for scaling instead of it's own width/height. This will work as a width/height override."
+    )

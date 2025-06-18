@@ -3,7 +3,7 @@ import math
 import torch  # type: ignore
 import torch.nn.functional as F  # type: ignore
 
-from .shared.ryuu_log import ryuu_log
+from ..modules.shared.ryuu_log import ryuu_log
 
 
 class ScaleToMultipleAdvanced:
@@ -64,14 +64,16 @@ class ScaleToMultipleAdvanced:
                         "step": 0.005,
                     },
                 ),
-                # "decouple_opt_res": (
+                # "img_use_opt_res": (
                 #     "BOOLEAN",
                 #     {
-                #         "default": True,
+                #         "default": False,
                 #         "tooltip": (
-                #             "By default the image will be resized using the optional input width and height if "
-                #             "those are given. So if this setting is set to 'True' then the image will be resized "
-                #             "based on it's own width and height."
+                #             "By default the image will be resized by using it's own dimensions (width/height).\n"
+                #             "If this setting is set to 'True' then the image will be resized based on the optional "
+                #             "width and height (so far they are given). In the case where this setting is 'True' "
+                #             "but neither or only one out of the two is given, the missing number will be substituted "
+                #             "using the image's own width and/or height."
                 #         ),
                 #     },
                 # ),

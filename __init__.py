@@ -1,4 +1,4 @@
-from .modules.clean_strings import CleanStringAdvanced
+from .modules.clean_strings_advanced import CleanStringAdvanced
 from .modules.color_matcher_bpfriendly import ColorMatch
 from .modules.extract_lora import ExtractAndSaveLora
 from .modules.fallback_passthrough import FallbackPassthrough
@@ -14,7 +14,8 @@ from .modules.primitive_number_ops import (
     FloatSlider,
     IntSlider,
 )
-from .modules.scale_to_multiple_advanced import ScaleToMultiple, ScaleToMultipleAdvanced
+from .modules.scale_to_multiple import ScaleToMultiple
+from .modules.scale_to_multiple_advanced import ScaleToMultipleAdvanced
 from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
 from .modules.z_test_node import RyuuTestNode

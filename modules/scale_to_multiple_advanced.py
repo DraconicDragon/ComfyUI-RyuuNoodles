@@ -193,7 +193,9 @@ class ScaleToMultipleBase:
         # Scale integer value, then round to nearest/floor/ceil multiple
         if val is None:
             return None
+
         val = int(round(val * scale_factor))
+
         if rounding_mode == "nearest":
             return int(round(val / multiple) * multiple)
         elif rounding_mode == "floor":
@@ -281,6 +283,9 @@ class ScaleToMultipleBase:
 
     def _process_scaling(
         self,
+        image,
+        width,
+        height,
         multiple,
         rounding_mode_width,
         rounding_mode_height,
@@ -288,9 +293,6 @@ class ScaleToMultipleBase:
         scale_factor_height,
         crop_mode,
         resize_mode,
-        image=None,
-        width=None,
-        height=None,
     ):
         # if image, width and height are all None, raise error
         if image is None and width is None and height is None:

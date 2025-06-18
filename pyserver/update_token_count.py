@@ -1,7 +1,7 @@
 import re
 
 from aiohttp import web
-from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast
+from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast # type: ignore
 
 from server import PromptServer  # type: ignore
 

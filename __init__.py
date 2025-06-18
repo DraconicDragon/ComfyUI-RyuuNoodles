@@ -34,22 +34,23 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_FloatPlainLarger": FloatPlainLarger,
     "Ryuu_FloatSlider": FloatSlider,
     "Ryuu_IntSlider": IntSlider,
-    "Ryuu_IsMultipleOf": IsMultipleOf,
     # Image nodes
     "Ryuu_ColorMatch": ColorMatch,
+    # Other Utility Nodes
+    "Ryuu_ScaleToMultiple": ScaleToMultiple,
+    "Ryuu_ScaleToMultipleAdvanced": ScaleToMultipleAdvanced,
+    "Ryuu_IsMultipleOf": IsMultipleOf,
     # Token Counter
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
-    # Experimental Nodes/Utils
-    "Ryuu_ScaleToMultipleAdvanced": ScaleToMultipleAdvanced,
-    "Ryuu_ScaleToMultiple": ScaleToMultiple,
+    # Experimental Nodes
     "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
-    # String cleaning/stripping nodes
     "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
     "Ryuu_TestNode": RyuuTestNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
+    "Ryuu_ColorMatch": "Color Match 🐲",
     "Ryuu_FallbackSwitchAny": "Switch Any Fallback 🐲",
     "Ryuu_FallbackSwitchImage": "Switch Image Fallback 🐲",
     "Ryuu_FallbackSwitchLatent": "Switch Latent Fallback 🐲",
@@ -59,11 +60,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FloatPlainLarger": "Float L 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
     "Ryuu_IsMultipleOf": "test Is Multiple Of x Check 🐲",
-    "Ryuu_ColorMatch": "Color Match 🐲",
+    "Ryuu_ScaleToMultiple": "Scale To Multiple 🐲",
+    "Ryuu_ScaleToMultipleAdvanced": "Scale To Multiple Adv. 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
     # Experimental Nodes/Utils
-    "Ryuu_ScaleToMultipleAdvanced": "Scale To Multiple Adv. 🐲",
-    "Ryuu_ScaleToMultiple": "Scale To Multiple 🐲",
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
     "Ryuu_CleanStringAdvanced": "Clean String Adv. 🐲",

@@ -17,13 +17,47 @@ class ScaleToMultipleAdvanced:
             "optional": {
                 "image": (
                     "IMAGE",
-                    {"tooltip": "Image to scale. If not provided, only width and height will be scaled."},
+                    {
+                        "tooltip": (
+                            "Image to scale. If not provided, only width and height will be scaled. "
+                            "If either or both of the optional width/height inputs are provided, the resizing will use the given input(s)."
+                        ),
+                    },
                 ),
-                "width": ("INT", {"default": None, "min": 1, "forceInput": True}),
-                "height": ("INT", {"default": None, "min": 1, "forceInput": True}),
+                "width": (
+                    "INT",
+                    {
+                        "default": None,
+                        "min": 1,
+                        "forceInput": True,
+                        "tooltip": (
+                            "Optional width to scale the image to after the multiple scaling.\n"
+                            "If no image is provided it will still output the scaled number."
+                        ),
+                    },
+                ),
+                "height": (
+                    "INT",
+                    {
+                        "default": None,
+                        "min": 1,
+                        "forceInput": True,
+                        "tooltip": (
+                            "Optional height to scale the image to after the multiple scaling.\n"
+                            "If no image is provided it will still output the scaled number."
+                        ),
+                    },
+                ),
             },
             "required": {
-                "multiple": ("INT", {"default": 64, "min": 1}),
+                "multiple": (
+                    "INT",
+                    {
+                        "default": 64,
+                        "min": 1,
+                        "tooltip": ("Multiple to scale to.\n Setting to 1 effectively disables this."),
+                    },
+                ),
                 "rounding_mode_width": (
                     ["nearest", "floor", "ceil"],
                     {
@@ -54,6 +88,7 @@ class ScaleToMultipleAdvanced:
                         "default": 1.0,
                         "min": 0.01,
                         "step": 0.005,
+                        "tooltip": ("How much to multiply width by before scaling to multiple."),
                     },
                 ),
                 "scale_factor_height": (
@@ -62,6 +97,7 @@ class ScaleToMultipleAdvanced:
                         "default": 1.0,
                         "min": 0.01,
                         "step": 0.005,
+                        "tooltip": ("How much to multiply height by before scaling to multiple."),
                     },
                 ),
                 # "img_use_opt_res": (
@@ -85,8 +121,8 @@ class ScaleToMultipleAdvanced:
                             "Crop mode for the image. \n"
                             "'stretch' will stretch the image to fill the target dimensions.\n"
                             "'center' will center the image in the target dimensions.\n"
-                            "'uniform' will scale the image to fit within the target dimensions while maintaining aspect ratio.\n"
                             "'fill' will scale the image to fill the target dimensions while maintaining aspect ratio, cropping if necessary.\n"
+                            "'uniform' will scale the image to fit within the target dimensions while maintaining aspect ratio.\n"
                             "'uniform fill' will scale the image to fill the target dimensions while maintaining aspect ratio, adding padding if necessary."
                         ),
                     },
@@ -102,9 +138,11 @@ class ScaleToMultipleAdvanced:
                         "bilinear - tensor",
                     ],
                     {
-                        "default": "bilinear",
+                        "default": "lanczos",
                         "tooltip": (
-                            "Resize mode for the image."
+                            "Resize mode for the image.\n"
+                            "'bilinear - tensor' is different from normal bilinear, it will use "
+                            "torch.nn.functional.interpolate() to resize the image and look very different from normal bilinear."
                         ),
                     },
                 ),
@@ -112,11 +150,18 @@ class ScaleToMultipleAdvanced:
         }
 
     RETURN_TYPES = ("IMAGE", "INT", "INT")
-    RETURN_NAMES = ("image", "width", "height")
+    RETURN_NAMES = ("scaled_image", "scaled_width", "scaled_height")
 
     FUNCTION = "main_operation"
 
     EXPERIMENTAL = True
+
+    DESCRIPTION = (
+        "Scales image dimensions and/or integers to a specified multiple, with options for rounding mode and pre-scaling.\n"
+        "If no image is provided, only the width and height will be scaled.\n"
+        "If image and width and/or height is provided, the image will use the "
+        "provided dimension for scaling instead of it's own width/height. This will work as a width/height override."
+    )
 
     CATEGORY = "RyuuNoodles/Utils"
 
@@ -224,7 +269,14 @@ class ScaleToMultipleAdvanced:
         width=None,
         height=None,
     ):
-        # Use image dimensions if width/height not provided
+        # if image, width and height are all None, raise error
+        if image is None and width is None and height is None:
+            raise ValueError(
+                "At least one of 'image', 'width', or 'height' must be provided. "
+                "Please provide at least one of these inputs."
+            )
+
+        # Use image dimensions if width/height not provided but image is
         if width is None and image is not None:
             ryuu_log(
                 "ScaleToMultiple: Width is None but image is provided, using image width for scaling.",
@@ -256,7 +308,7 @@ class ScaleToMultipleAdvanced:
             # No scaling needed
             return (image, final_w, final_h)
 
-        use_tensor = (resize_mode == "bilinear - tensor")
+        use_tensor = resize_mode == "bilinear - tensor"
         pil_mode = resize_mode if resize_mode != "bilinear - tensor" else "bilinear"
 
         def resize_func(img, h, w):

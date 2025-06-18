@@ -7,6 +7,7 @@ from .modules.fallback_switches import (
     FallbackSwitchImage,
     FallbackSwitchLatent,
 )
+from .modules.is_multiple_of import IsMultipleOf
 from .modules.primitive_number_ops import (
     FloatPlain,
     FloatPlainLarger,
@@ -16,6 +17,7 @@ from .modules.primitive_number_ops import (
 from .modules.scale_to_multiple_advanced import ScaleToMultiple, ScaleToMultipleAdvanced
 from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
+from .modules.z_test_node import RyuuTestNode
 
 # to get the routes registered
 from .pyserver import update_token_count  # noqa: F401
@@ -31,6 +33,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_FloatPlainLarger": FloatPlainLarger,
     "Ryuu_FloatSlider": FloatSlider,
     "Ryuu_IntSlider": IntSlider,
+    "Ryuu_IsMultipleOf": IsMultipleOf,
     # Image nodes
     "Ryuu_ColorMatch": ColorMatch,
     # Token Counter
@@ -42,6 +45,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
     # String cleaning/stripping nodes
     "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
+    "Ryuu_TestNode": RyuuTestNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
@@ -53,6 +57,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_FloatPlain": "Float 🐲",
     "Ryuu_FloatPlainLarger": "Float L 🐲",
     "Ryuu_IntSlider": "Int Slider 🐲",
+    "Ryuu_IsMultipleOf": "test Is Multiple Of x Check 🐲",
     "Ryuu_ColorMatch": "Color Match 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
     # Experimental Nodes/Utils
@@ -61,6 +66,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
     "Ryuu_CleanStringAdvanced": "Clean String Adv. 🐲",
+    "Ryuu_TestNode": "🚧 Ryuu Test Node 🐲",
 }
 
 WEB_DIRECTORY = "./js"

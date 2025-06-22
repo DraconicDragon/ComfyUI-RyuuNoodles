@@ -89,16 +89,16 @@ class CleanStringAdvanced:
                             "camelcase = likeThisExample ('appleBananaOrange.')\n"
                             "pascalcase = LikeThisExample ('AppleBananaOrange.')\n"
                             "snakecase = like_this_example ('apple_banana_orange.')\n"
-            # 1) Collapse multiple spaces/tabs (but NOT newlines) into a single space, and remove trailing spaces before newlines
-            cleaned = re.sub(r"[ \t]{2,}", " ", text)
-            cleaned = re.sub(r"[ \t]+(\r?\n)", r"\1", cleaned)
+                        )
+                    }
+                )
+            }
+        }
 
-            # 2) Normalize comma spacing within lines
-            #    Remove spaces/tabs around commas, then ensure one space after each comma
-            cleaned = re.sub(r"[ \t]*,[ \t]*", ", ", cleaned)
-
-            # 3) Collapse repeated comma+space sequences into a single ", "
-            cleaned = re.sub(r"(,\s*){2,}", ", ", cleaned)
+    CATEGORY = "RyuuNoodles 🐲/Text"
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
+    FUNCTION = "clean_text"
     EXPERIMENTAL = True
 
     DESCRIPTION = (

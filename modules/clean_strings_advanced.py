@@ -10,13 +10,17 @@ class CleanStringAdvanced:
             "required": {
                 "input_text": (
                     "STRING",
-                    {"default": "", "multiline": True, "tooltip": "Text input to be cleaned."},
+                    {
+                        "default": "",
+                        "multiline": True,
+                        "tooltip": ("Text input to be cleaned."),
+                    },
                 ),
                 "strip": (
                     ["off", "left", "right", "both"],
                     {
                         "default": "both",
-                        "tooltip": "Control which side(s) of whitespace to strip from the input string.",
+                        "tooltip": ("Control which side(s) of whitespace to strip from the input string."),
                     },
                 ),
                 "trailing_commas": (
@@ -24,9 +28,8 @@ class CleanStringAdvanced:
                     {
                         "default": "remove",
                         "tooltip": (
-                            "Remove or add a comma at the end of the input string."
-                            "Will not add a comma if one already exists,"
-                            "but will add a space if 'add + space' is chosen and a comma exists but no space."
+                            "Remove or add a comma at the end of the input string.\n"
+                            "Will not add a comma if one already exists, but will add a space if 'add + space' is chosen and a comma exists but no space."
                         ),
                     },
                 ),
@@ -35,7 +38,7 @@ class CleanStringAdvanced:
                     {
                         "default": "off",
                         "tooltip": (
-                            "Control how newlines are handled:\n"
+                            "Control how newlines are handled\n"
                             "off = keep all lines\n"
                             "remove empty = drop blank lines\n"
                             "collapse lines = join all lines into one"
@@ -46,21 +49,56 @@ class CleanStringAdvanced:
                     ["off", "spaces", "spaces + commas"],
                     {
                         "default": "spaces + commas",
-                        "tooltip": "Replace multiple subsequently appearing spaces or in combination with commas in the input string with a single occurance of what's being removed.",
+                        "tooltip": (
+                            "Collapse multiple consecutive spaces into one, or collapse both spaces and commas into a single occurrence depending on the selected option.\n"
+                            "Example: 'apple,  banana,  apple,  orange.' → 'apple, banana, orange.'\n"
+                        ),
                     },
                 ),
-                "to_lowercase": (
+                "remove_duplicate_tags": (
                     "BOOLEAN",
-                    {"default": False, "tooltip": "Convert all characters in the string to lowercase."},
+                    {
+                        "default": False,
+                        "tooltip": (
+                            "Remove duplicate tags/words separated by commas, handling spaces around commas and ensuring only unique entries remain.\n"
+                            "Example: 'apple, banana, apple, orange' → 'apple, banana, orange'\n"
+                        ),
+                    },
                 ),
-            },
-        }
+                "case": (
+                    [
+                        "off",
+                        "lowercase",
+                        "uppercase",
+                        "capitalize",
+                        "titlecase",
+                        "camelcase",
+                        "pascalcase",
+                        "snakecase",
+                        "kebabcase",
+                    ],
+                    {
+                        "default": "off",
+                        "tooltip": (
+                            "Change the case of the string. Examples with input 'apple, banana, orange.':\n"
+                            "off = no change ('apple, banana, orange.')\n"
+                            "lowercase = all lowercase ('apple, banana, orange.')\n"
+                            "uppercase = ALL UPPERCASE ('APPLE, BANANA, ORANGE.')\n"
+                            "capitalize = First letter uppercase, rest lowercase ('Apple, banana, orange.')\n"
+                            "titlecase = Every Word Capitalized ('Apple, Banana, Orange.')\n"
+                            "camelcase = likeThisExample ('appleBananaOrange.')\n"
+                            "pascalcase = LikeThisExample ('AppleBananaOrange.')\n"
+                            "snakecase = like_this_example ('apple_banana_orange.')\n"
+            # 1) Collapse multiple spaces/tabs (but NOT newlines) into a single space, and remove trailing spaces before newlines
+            cleaned = re.sub(r"[ \t]{2,}", " ", text)
+            cleaned = re.sub(r"[ \t]+(\r?\n)", r"\1", cleaned)
 
-    CATEGORY = "RyuuNoodles 🐲/Text"
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
-    FUNCTION = "clean_text"
+            # 2) Normalize comma spacing within lines
+            #    Remove spaces/tabs around commas, then ensure one space after each comma
+            cleaned = re.sub(r"[ \t]*,[ \t]*", ", ", cleaned)
 
+            # 3) Collapse repeated comma+space sequences into a single ", "
+            cleaned = re.sub(r"(,\s*){2,}", ", ", cleaned)
     EXPERIMENTAL = True
 
     DESCRIPTION = (
@@ -74,7 +112,7 @@ class CleanStringAdvanced:
         "Useful for normalizing input strings for consistent processing."
     )
 
-    def collapse_spaces_comma(self, collapse_commas: bool, text: str) -> str:
+    def _collapse_spaces_comma(self, collapse_commas: bool, text: str) -> str:
         # Collapse multiple spaces into one (ignoring newlines)
         if not collapse_commas:
             cleaned = re.sub(r"[ ]{2,}", " ", text)
@@ -94,19 +132,46 @@ class CleanStringAdvanced:
 
         return cleaned
 
+    def _apply_case(self, text: str, case: str) -> str:
+        if case == "off":
+            return text
+        elif case == "lowercase":
+            return text.lower()
+        elif case == "uppercase":
+            return text.upper()
+        elif case == "capitalize":
+            return text.capitalize()
+        elif case == "titlecase":
+            return text.title()
+        elif case == "camelcase":
+            words = re.split(r"[\s,_-]+", text)
+            if not words:
+                return text
+            first = words[0].lower()
+            rest = [w.capitalize() for w in words[1:]]
+            return first + "".join(rest)
+        elif case == "pascalcase":
+            words = re.split(r"[\s,_-]+", text)
+            return "".join(w.capitalize() for w in words)
+        elif case == "snakecase":
+            words = re.split(r"[\s,_-]+", text)
+            return "_".join(w.lower() for w in words if w)
+        elif case == "kebabcase":
+            words = re.split(r"[\s,_-]+", text)
+            return "-".join(w.lower() for w in words if w)
+        else:
+            return text
+
     def clean_text(
         self,
         input_text,
+        case,
         strip,
         trailing_commas,
-        collapse,
-        to_lowercase,
         newlines,
+        collapse,
+        remove_duplicate_tags,
     ):
-        # lowercase convert first
-        if to_lowercase:
-            input_text = input_text.lower()
-
         # Split into lines for newline handling
         lines = input_text.splitlines()
 
@@ -125,9 +190,9 @@ class CleanStringAdvanced:
 
         if collapse == "spaces" or collapse == "spaces + commas":
             if collapse == "spaces + commas":
-                cleaned = self.collapse_spaces_comma(True, cleaned)
+                cleaned = self._collapse_spaces_comma(True, cleaned)
             else:
-                cleaned = self.collapse_spaces_comma(False, cleaned)
+                cleaned = self._collapse_spaces_comma(False, cleaned)
 
         # Strip leading/trailing whitespace
         if strip in ("left", "both"):
@@ -147,5 +212,19 @@ class CleanStringAdvanced:
                     cleaned += " "
             elif not re.search(r",[ \t]*$", cleaned):
                 cleaned += ", "
+
+        # Remove duplicate comma-separated tags/words
+        if remove_duplicate_tags is True:
+            tags = [tag.strip() for tag in cleaned.split(",")]
+            seen = set()
+            unique_tags = []
+            for tag in tags:
+                if tag and tag not in seen:
+                    seen.add(tag)
+                    unique_tags.append(tag)
+            cleaned = ", ".join(unique_tags)
+
+        # Apply case transformation last
+        cleaned = self._apply_case(cleaned, case)
 
         return (cleaned,)

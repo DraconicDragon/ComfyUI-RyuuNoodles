@@ -2,6 +2,7 @@
 # Licensed GPL-3.0
 
 
+import numpy as np
 import torch
 
 from ..modules.shared.ryuu_log import ryuu_log
@@ -81,18 +82,25 @@ https://github.com/hahnec/color-matcher/
             raise ValueError("[RyuuNoodles Color Match] Use either single reference image or a matching batch of reference images.")
 
         for i in range(batch_size):
-            image_target_np = images_target_np if batch_size == 1 else images_target[i].numpy()
+            image_target_np_i = images_target_np if batch_size == 1 else images_target[i].numpy()
             image_ref_np_i = image_ref_np if image_ref.size(0) == 1 else images_ref[i].numpy()
 
             try:
-                image_result = cm.transfer(src=image_target_np, ref=image_ref_np_i, method=method)
+                # Convert data to float64 for the library
+                target_f64 = image_target_np_i.astype(np.float64)
+                ref_f64 = image_ref_np_i.astype(np.float64)
+                image_result = cm.transfer(src=target_f64, ref=ref_f64, method=method)
             except BaseException as e:
                 ryuu_log(f"[Color Match] Error occurred during transfer: {e}", loglevel="error")
                 break
 
             # Apply the strength multiplier
-            image_result = image_target_np + strength * (image_result - image_target_np)
+            image_result = target_f64 + strength * (image_result - target_f64)
             out.append(torch.from_numpy(image_result))
+
+        # in case the loop breaks on first item
+        if not out:
+            return (image_target,)
 
         out = torch.stack(out, dim=0).to(torch.float32)
         out.clamp_(0, 1)

@@ -1,15 +1,76 @@
-name: 📝 Generate Changelog and Release
+name: 🚀 Create GitHub Release
 
 on:
+  push:
+    paths:
+      - "pyproject.toml" # runs on every branch
   workflow_dispatch:
-  workflow_run:
-    workflows: ["📌 Auto Tag from pyproject.toml"]
-    types:
-      - completed
 
 jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to push tags
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      tag_created: ${{ steps.create_tag.outputs.tag_created }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # fetch full history including tags
+          fetch-tags: true
+
+      - name: Extract version
+        id: get_version
+        run: |
+          # grab version="X.Y.Z(-suffix)" from pyproject.toml
+          version=$(grep -E '^version *= *' pyproject.toml \
+                 | sed -E 's/version *= *"([^"]+)"/\1/')
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Check for existing tag
+        id: check_tag
+        run: |
+          tag="v${{ steps.get_version.outputs.version }}"
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $tag already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $tag does not exist"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create & push tag
+        id: create_tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          tag="v${{ steps.get_version.outputs.version }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$tag"
+          git push origin "$tag"
+          echo "tag_created=true" >> $GITHUB_OUTPUT
+          echo "Created and pushed tag: $tag"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip tag creation
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "tag_created=false" >> $GITHUB_OUTPUT
+          echo "Skipping tag creation as it already exists"
+
   release:
     runs-on: ubuntu-latest
+    needs: auto-tag
+    if: needs.auto-tag.outputs.tag_created == 'true'
+    permissions:
+      contents: write # needed to create releases
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,7 +92,7 @@ jobs:
       - name: Exit if prerelease
         if: contains(steps.tags.outputs.latest_tag, '-')
         run: |
-          echo "Pre-release tag detected (${ { steps.tags.outputs.latest_tag }}), skipping changelog."
+          echo "Pre-release tag detected (${{ steps.tags.outputs.latest_tag }}), skipping changelog."
           exit 0
 
       - name: Build Changelog
@@ -65,16 +126,6 @@ jobs:
           echo "${{ steps.changelog.outputs.changelog }}" > CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.tags.outputs.previous_tag }}...${{ steps.tags.outputs.latest_tag }}" >> CHANGELOG.md
-
-      # - name: Commit changelog
-      #   run: |
-      #     git config user.name "github-actions[bot]"
-      #     git config user.email "github-actions[bot]@users.noreply.github.com"
-      #     git add CHANGELOG.md
-      #     git commit -m "chore: update CHANGELOG.md for ${{ steps.tags.outputs.latest_tag }}"
-      #     git push
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release with changelog
         uses: softprops/action-gh-release@v2

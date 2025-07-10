@@ -28,6 +28,13 @@ You can find the settings the custom node pack adds here as well as the defaults
 - **Default Value**: `1000`
 - **Tooltip**: Default: 1000 Suggested to stay above 200ms.
 
+## Token Count Overlay > Compact Mode
+
+- **ID**: `RyuuSettings.TokenCountOverlay.CompactMode`
+- **Type**: boolean
+- **Default Value**: `false`
+- **Tooltip**: This will simply remove the word 'Tokens' from the token count overlay to save space. Also changes the name of some tokenizers to be shorter, e.g. 'GEMMA2' → 'G2', 'LLAMA3' → 'L3'.
+
 ## Token Count Overlay > Support 'BREAK' keyword
 
 - **ID**: `RyuuSettings.TokenCountOverlay.SupportBreakKeyword`

@@ -1,6 +1,12 @@
 import { api } from "../../scripts/api.js";
 import { app } from "../../scripts/app.js";
 
+const compactNames = {
+    gemma2: "G2",
+    llama3: "L3",
+    auraflow: "AF",
+};
+
 function isTokenCounterEnabled() {
     return app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.Enabled") !== false;
 }
@@ -30,7 +36,10 @@ function parseSettingsString(raw) {
 }
 
 // helper to turn e.g. "clip_l" → "Clip L", "t5_fast" → "T5🚀"
-function prettifyTokenizerName(tok) {
+function prettifyTokenizerName(tok, compactMode) {
+    if (compactMode && compactNames[tok.toLowerCase()]) {
+        return compactNames[tok.toLowerCase()];
+    }
     const parts = tok.split("_");
     const hasFast = parts.includes("fast");
     const filtered = parts.filter(p => p !== "fast");
@@ -215,11 +224,13 @@ async function registerTokenCountNode(nodeType, nodeData) {
         if (!widget || widget.last_y == null) return;
 
         // build "Clip L Tokens: 0 | T5🚀 Tokens: 0 | Chars: 0"
+        const compactMode = app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.CompactMode") === true;
         const parts = nodeWidgetMappingConfig.tok_types.map(tt => {
             const cnt = this._tokenCounts?.[tt] || 0;
-            return `${prettifyTokenizerName(tt)} Tokens: ${cnt}`;
+            const tokenLabel = compactMode ? "" : " Tokens";
+            return `${prettifyTokenizerName(tt, compactMode)}${tokenLabel}: ${cnt}`;
         });
-        parts.push(`Chars: ${(this._lastText || "").length}`);
+        parts.push(`${compactMode ? "C" : "Chars"}: ${(this._lastText || "").length}`);
         const txt = parts.join(" | ");
 
         // text styling

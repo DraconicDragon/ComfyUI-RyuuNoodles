@@ -25,10 +25,23 @@ app.registerExtension({
             type: "boolean",
             defaultValue: false,
             tooltip: "This will simply increase the CLIP-L counter number to fill up to the next upper multiple of 75 " +
-                "when 'BREAK' is encountered in the text. NOTE: ComfyUI by default doesn't support 'BREAK' " + 
+                "when 'BREAK' is encountered in the text. NOTE: ComfyUI by default doesn't support 'BREAK' " +
                 "and you need to use a custom node for the actual functionality.",
             onChange: (newVal, oldVal) => {
                 console.log(`RyuuSettings.TokenCountOverlay.SupportBreakKeyword has been changed from ${oldVal} to ${newVal}`);
+            },
+        },
+
+        {
+            id: "RyuuSettings.TokenCountOverlay.CompactMode",
+            category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Compact Mode'],
+            name: "Compact Mode",
+            type: "boolean",
+            defaultValue: false,
+            tooltip: "This will simply remove the word 'Tokens' from the token count overlay to save space.\n" +
+                "Also changes the name of some tokenizers to be shorter, e.g. 'GEMMA2' → 'G2', 'LLAMA3' → 'L3'.",
+            onChange: (newVal, oldVal) => {
+                console.log(`RyuuSettings.TokenCountOverlay.ExcludeTokensWord has been changed from ${oldVal} to ${newVal}`);
             },
         },
 

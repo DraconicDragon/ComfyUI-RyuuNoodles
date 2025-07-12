@@ -89,7 +89,7 @@ async function updateTokenCount(node) {
         const data = await resp.json();
         node._tokenCounts = data.token_counts || {};
     } catch (e) {
-        console.error("[TokenCounter] Error:", e);
+        console.error("[RyuuNoodles TokenCounterOverlay] Error:", e);
         node._tokenCounts = {};
     }
 

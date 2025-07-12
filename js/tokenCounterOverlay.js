@@ -3,9 +3,12 @@ import { app } from "../../scripts/app.js";
 
 const compactNames = {
     gemma2: "G2",
+    gemma3: "G3",
     llama3: "L3",
+    qwen25vl: "Q2.5VL",
     auraflow: "AF",
 };
+// todo: move this to some config file maybe? related todo in pyserver file
 
 function isTokenCounterEnabled() {
     return app.extensionManager.setting.get("RyuuSettings.TokenCountOverlay.Enabled") !== false;

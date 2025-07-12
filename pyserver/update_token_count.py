@@ -39,6 +39,7 @@ def get_tokenizer(name):
     #         CLIPTokenizer, "stabilityai/stable-diffusion-xl-base-1.0", subfolder="tokenizer_2", log_name="CLIP-G"
     #     )
 
+    # NOTE: below are LLM tokenizers, most output same or very similar token counts but they are NOT the same
     elif key == "t5":  # T5-XXL | Chroma, Flux (1st), SD3(.5), etc
         # # NOTE: BFL flux dev is also possible, but they should all do the same thing because same spiece.model file iirc
         tok = load_and_log(T5Tokenizer, "google/t5-v1_1-xxl", log_name="T5")
@@ -48,14 +49,22 @@ def get_tokenizer(name):
         tok = load_and_log(AutoTokenizer, "google/umt5-xxl", log_name="UMT5")
     elif key == "gemma2":  # Gemma 2 2B | Lumina Image 2.0
         tok = load_and_log(AutoTokenizer, "unsloth/gemma-2-2b", log_name="Gemma2")
+    elif key == "gemma3":  # Gemma 3 1B/4B | *Custom* | NOTE: VERY similar to G2 but not same.
+        tok = load_and_log(AutoTokenizer, "unsloth/gemma-3-1b-it", log_name="Gemma3")
     elif key == "llama3":  # LLaMA 3.1 8B | hidream, hunyuan video, etc
         tok = load_and_log(AutoTokenizer, "unsloth/Meta-Llama-3.1-8B-Instruct", log_name="LLaMA3")
+    elif key == "qwen25vl" or key == "qwen2.5vl":  # Qwen 2.5 VL | OmnigenV2
+        tok = load_and_log(AutoTokenizer, "Qwen/Qwen2.5-VL-3B-Instruct", log_name="LLaMA3")
     elif key == "auraflow":  # Pile T5 me thinks | AuraFlow/PonyFlow (Pony v7)
         tok = load_and_log(AutoTokenizer, "fal/AuraFlow", subfolder="tokenizer", log_name="AuraFlow")
     else:
         tok = None
     _tokenizer_cache[key] = tok
     return tok
+
+
+# todo: allow adding through config file or something, so users can add their own tokenizers
+# related todo in tokenCounter.Overlayjs file
 
 
 # Helper function to strip weighting syntax from the text

@@ -2,6 +2,7 @@
 t.md
 test.py
 node.zip
+test_scaling.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

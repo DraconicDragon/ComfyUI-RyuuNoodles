@@ -15,7 +15,7 @@ You can find the settings the custom node pack adds here as well as the defaults
 - **ID**: `RyuuSettings.TokenCountOverlay`
 - **Type**: text
 - **Default Value**: `Ryuu_TokenCountTextBox.input_text:CLIP_L,T5_FAST;CLIPTextEncode.text:CLIP_L,T5_FAST;`
-- **Tooltip**: Enter the node names (internal `nodeData.name`), their widget names and tokenizer types. A token counter will appear above the supplied widget. Supported tokenizer types: CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW Please check the GitHub README for more info
+- **Tooltip**: Enter the node names (internal `nodeData.name`), their widget names and tokenizer types. A token counter will appear above the supplied widget. Supported tokenizer types: CLIP_L, T5, T5_FAST, UMT5, GEMMA2, GEMMA3, LLAMA3, QWEN25VL, AURAFLOW Please check the GitHub README for more info
 
 ## Token Count Overlay > Update Interval in ms
 

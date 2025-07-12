@@ -41,7 +41,7 @@ This is done by going to the "RyuuNoodles 🐲" settings page and adding the int
 
 `Node_Name.widget_name:Tokenizer1,Tok2,Tok3;Node Name 2.widget_name:Tok1;` etc...
 
-- Supported tokenizers: `CLIP_L, T5, T5_FAST, UMT5, GEMMA2, LLAMA3, AURAFLOW`
+- Supported tokenizers: `CLIP_L, T5, T5_Fast, UMT5, Gemma2, Gemma3, LlaMA3, Qwen2.5VL, AuraFlow` (case insensitive)
 - RegEx is _not_ supported; Spaces are allowed, they will be stripped anyway (node name is excluded from stripping <sub>too naughty</sub>)
 - The tokenizer types will appear in the counter in the order you added them.
 
@@ -50,7 +50,7 @@ Right-click a node and select 'Properties Panel'. The value for `Node name for S
 
 **To get the widget name:**  
 Usually it's simply the placeholder text (or input name on single line text widgets).  
-<sub>(if there's a custom placeholder text... uh good luck, maybe need to read the code of that custom node in that case)</sub>
+<sub>(if there's a custom placeholder text set... then uh good luck, maybe need to read the code of that custom node in that case?)</sub>
 
 #### Example (also default value)
 

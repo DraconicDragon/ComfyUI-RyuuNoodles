@@ -16,6 +16,9 @@ from .modules.primitive_number_ops import (
 )
 from .modules.scale_to_multiple import ScaleToMultiple
 from .modules.scale_to_multiple_advanced import ScaleToMultipleAdvanced
+from .modules.scale_to_multiple_latent_size_picker import (
+    ScaleToMultipleLatentSizePicker,
+)
 from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
 from .modules.z_test_node import RyuuTestNode
@@ -39,6 +42,7 @@ NODE_CLASS_MAPPINGS = {
     # Other Utility Nodes
     "Ryuu_ScaleToMultiple": ScaleToMultiple,
     "Ryuu_ScaleToMultipleAdvanced": ScaleToMultipleAdvanced,
+    "Ryuu_ScaleToMultipleLatentSizePicker": ScaleToMultipleLatentSizePicker,
     "Ryuu_IsMultipleOf": IsMultipleOf,
     # Token Counter
     "Ryuu_TokenCountTextBox": TokenCountTextBox,
@@ -62,6 +66,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_IsMultipleOf": "test Is Multiple Of x Check 🐲",
     "Ryuu_ScaleToMultiple": "Scale To Multiple 🐲",
     "Ryuu_ScaleToMultipleAdvanced": "Scale To Multiple Adv. 🐲",
+    "Ryuu_ScaleToMultipleLatentSizePicker": "Latent Size Picker 🐲",
     "Ryuu_TokenCountTextBox": "Textbox 🐲",
     # Experimental Nodes/Utils
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",

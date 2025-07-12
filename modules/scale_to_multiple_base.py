@@ -1,9 +1,9 @@
-import math
-
+import numpy as np  # type: ignore
 import torch  # type: ignore
 import torch.nn.functional as F  # type: ignore
 
 from .shared.ryuu_log import ryuu_log
+from .shared.scaling_utils import ScalingUtils
 
 
 class ScaleToMultipleBase:
@@ -117,98 +117,20 @@ class ScaleToMultipleBase:
         # ),
 
         # Add rounding mode inputs based on flags
-        if cls.ALLOW_SEPARATE_ROUNDING_MODES:
-            inputs["required"]["rounding_mode_width"] = (
-                ["nearest", "floor", "ceil"],
-                {
-                    "default": "nearest",
-                    "tooltip": (
-                        "Rounding mode for width. "
-                        "'nearest' will round to the nearest multiple of 'multiple' value.\n"
-                        "'floor' will round down to the nearest multiple. \n"
-                        "'ceil' will round up."
-                    ),
-                },
-            )
-            inputs["required"]["rounding_mode_height"] = (
-                ["nearest", "floor", "ceil"],
-                {
-                    "default": "nearest",
-                    "tooltip": (
-                        "Rounding mode for height. "
-                        "'nearest' will round to the nearest multiple of 'multiple' value.\n"
-                        "'floor' will round down to the nearest multiple. \n"
-                        "'ceil' will round up."
-                    ),
-                },
-            )
-        else:
-            inputs["required"]["rounding_mode"] = (
-                ["nearest", "floor", "ceil"],
-                {
-                    "default": "nearest",
-                    "tooltip": (
-                        "Rounding mode for both width and height. "
-                        "'nearest' will round to the nearest multiple of 'multiple' value.\n"
-                        "'floor' will round down to the nearest multiple. \n"
-                        "'ceil' will round up."
-                    ),
-                },
-            )
+        inputs["required"].update(
+            ScalingUtils.create_rounding_mode_inputs(separate_modes=cls.ALLOW_SEPARATE_ROUNDING_MODES)
+        )
 
         # Add scale factor inputs based on flags
-        if cls.ALLOW_SEPARATE_SCALE_FACTORS:
-            inputs["required"]["scale_factor_width"] = (
-                "FLOAT",
-                {
-                    "default": 1.0,
-                    "min": 0.01,
-                    "step": 0.005,
-                    "tooltip": ("How much to multiply width by before scaling to multiple."),
-                },
-            )
-            inputs["required"]["scale_factor_height"] = (
-                "FLOAT",
-                {
-                    "default": 1.0,
-                    "min": 0.01,
-                    "step": 0.005,
-                    "tooltip": ("How much to multiply height by before scaling to multiple."),
-                },
-            )
-        else:
-            inputs["required"]["scale_factor"] = (
-                "FLOAT",
-                {
-                    "default": 1.0,
-                    "min": 0.01,
-                    "step": 0.005,
-                    "tooltip": ("How much to multiply both width and height by before scaling to multiple."),
-                },
-            )
+        inputs["required"].update(
+            ScalingUtils.create_scale_factor_inputs(separate_factors=cls.ALLOW_SEPARATE_SCALE_FACTORS)
+        )
 
         return inputs
-
-    def _scale_int(self, val, rounding_mode, scale_factor, multiple):
-        # Scale integer value, then round to nearest/floor/ceil multiple
-        if val is None:
-            return None
-
-        val = int(round(val * scale_factor))
-
-        if rounding_mode == "nearest":
-            return int(round(val / multiple) * multiple)
-        elif rounding_mode == "floor":
-            return int(math.floor(val / multiple) * multiple)
-        elif rounding_mode == "ceil":
-            return int(math.ceil(val / multiple) * multiple)
-        else:
-            return val
 
     def _create_placeholder_image(self, width, height):
         # Create a placeholder image if no input image is provided
         try:
-            import numpy as np
             from PIL import Image, ImageDraw, ImageFont
         except ImportError:
             ryuu_log(
@@ -252,7 +174,6 @@ class ScaleToMultipleBase:
         return tensor_image
 
     def _pil_resize(self, image, target_h, target_w, mode):
-        import numpy as np
         from PIL import Image
 
         mode_map = {
@@ -315,8 +236,8 @@ class ScaleToMultipleBase:
             )
             height = image.shape[1]
 
-        scaled_width = self._scale_int(width, rounding_mode_width, scale_factor_width, multiple)
-        scaled_height = self._scale_int(height, rounding_mode_height, scale_factor_height, multiple)
+        scaled_width = ScalingUtils.scale_int(width, rounding_mode_width, scale_factor_width, multiple)
+        scaled_height = ScalingUtils.scale_int(height, rounding_mode_height, scale_factor_height, multiple)
 
         if image is None:
             # No image: return placeholder image with scaled dimensions
@@ -415,21 +336,14 @@ class ScaleToMultipleBase:
         crop_mode = kwargs["crop_mode"]
         resize_mode = kwargs["resize_mode"]
 
-        # Extract rounding mode parameters based on flags
-        if self.ALLOW_SEPARATE_ROUNDING_MODES:
-            rounding_mode_width = kwargs["rounding_mode_width"]
-            rounding_mode_height = kwargs["rounding_mode_height"]
-        else:
-            rounding_mode = kwargs["rounding_mode"]
-            rounding_mode_width = rounding_mode_height = rounding_mode
-
-        # Extract scale factor parameters based on flags
-        if self.ALLOW_SEPARATE_SCALE_FACTORS:
-            scale_factor_width = kwargs["scale_factor_width"]
-            scale_factor_height = kwargs["scale_factor_height"]
-        else:
-            scale_factor = kwargs["scale_factor"]
-            scale_factor_width = scale_factor_height = scale_factor
+        # Extract rounding mode and scale factor parameters based on flags
+        rounding_mode_width, rounding_mode_height, scale_factor_width, scale_factor_height = (
+            ScalingUtils.extract_scaling_params(
+                kwargs,
+                separate_modes=self.ALLOW_SEPARATE_ROUNDING_MODES,
+                separate_factors=self.ALLOW_SEPARATE_SCALE_FACTORS,
+            )
+        )
 
         return self._process_scaling(
             image,
@@ -443,5 +357,3 @@ class ScaleToMultipleBase:
             crop_mode,
             resize_mode,
         )
-
-

@@ -23,7 +23,6 @@ class ScalingUtils:
         """
         if val is None:
             return None
-        print("test")
         val = int(round(val * scale_factor))
 
         if rounding_mode == "nearest":

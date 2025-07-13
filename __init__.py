@@ -25,6 +25,7 @@ from .modules.z_test_node import RyuuTestNode
 
 # to get the routes registered
 from .pyserver import update_token_count  # noqa: F401
+from .pyserver import loglevel  # noqa: F401
 
 NODE_CLASS_MAPPINGS = {
     # Switches and Passthrough nodes

@@ -1,9 +1,12 @@
+import { api } from "../../scripts/api.js";
 import { app } from "../../scripts/app.js";
 
 app.registerExtension({
     name: "RyuuNoodles.Settings",
     settings: [
-        // NOTE: The order the settings are displayed in the UI is reverse from how they show up in code
+        // NOTE: The order the settings are displayed in the UI is reverse from how they show up in code, except for category name, thats alphabetical it seems 
+        // region: TCO settings
+        /// Token Counter Overlay settings
         {
             id: "RyuuSettings.TokenizerAddSpecialTokens",
             category: ['RyuuNoodles 🐲', 'Token Count Overlay', 'Tokenizer special tokens'],
@@ -88,6 +91,39 @@ app.registerExtension({
                 window.dispatchEvent(new CustomEvent("RyuuNoodles.TokenCounterOverlay.Toggle", { detail: newVal }));
             },
         },
+        // endregion: TCO settings
+
+        // region: General settings
+        /// General settings
+        {
+            id: "RyuuSettings.General.LogLevel",
+            category: ['RyuuNoodles 🐲', 'General', 'Log Level'],
+            name: "Set Log Level",
+            type: "combo",
+            defaultValue: "Warning",
+            options: ["Debug", "Info", "Warning", "Error", "Critical"],
+            tooltip: "Set the log level for RyuuNoodles backend. " +
+                "'Warning' is recommended if you don't want to see the generic " +
+                "messages from nodes like switches or scale to multiple.",
+            onChange: async (newVal, oldVal) => {
+                //console.log(`RyuuSettings.General.LogLevel has been changed from ${oldVal} to ${newVal}`);
+                try {
+                    const response = await api.fetchApi("/ryuu/set_loglevel", {
+                        method: "PUT",
+                        body: JSON.stringify({ loglevel: newVal }),
+                    });
+                    const result = await response.json();
+                    if (result.status === "success" && result.loglevel === newVal.toUpperCase()) {
+                        console.log(`RyuuSettings.General.LogLevel updated successfully to ${result.loglevel}`);
+                    } else {
+                        console.error("Failed to update RyuuSettings.General.LogLevel:", result);
+                    }
+                } catch (err) {
+                    console.error("Error updating RyuuSettings.General.LogLevel:", err);
+                }
+            },
+        },
+        // endregion: General settings
     ],
 });
 

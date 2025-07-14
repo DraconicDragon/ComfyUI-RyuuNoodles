@@ -2,7 +2,6 @@ import os
 
 from aiohttp import web
 
-from ..modules.shared.ryuu_log import ryuu_log
 from server import PromptServer  # type: ignore
 
 routes = PromptServer.instance.routes
@@ -17,13 +16,6 @@ async def set_loglevel(request):
 
     loglevel = data.get("loglevel", "")
     os.environ["RYUU_LOGLEVEL"] = loglevel.upper()
-
-    ryuu_log("Log level set to:", loglevel.upper(), loglevel="debug")
-    # ryuu_log("DEBUG Log Level test", loglevel="debug")
-    # ryuu_log("INFO Log Level test", loglevel="info")
-    # ryuu_log("WARNING Log Level test", loglevel="warning")
-    # ryuu_log("ERROR Log Level test", loglevel="error")
-    # ryuu_log("CRITICAL Log Level test", loglevel="critical")
 
     resp_data = {"status": "success", "loglevel": loglevel.upper()}
 

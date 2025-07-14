@@ -1,4 +1,5 @@
 import re
+import sys
 
 from aiohttp import web
 from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast
@@ -18,6 +19,10 @@ _tokenizer_cache = {}
 def load_and_log(tokenizer_cls, *args, log_name=None, **kwargs):
     if log_name:
         ryuu_log(f"Loading {log_name} tokenizer...", loglevel="debug")
+        # Force the log to be displayed immediately
+        sys.stdout.flush()
+        sys.stderr.flush()
+
     tok = tokenizer_cls.from_pretrained(*args, **kwargs)
     if log_name:
         ryuu_log(f"Loaded {log_name} tokenizer.", loglevel="debug")

@@ -1,5 +1,4 @@
 import re
-import warnings
 
 from aiohttp import web
 from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast

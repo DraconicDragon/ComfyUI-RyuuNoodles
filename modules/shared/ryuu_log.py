@@ -46,7 +46,7 @@ def ryuu_log(*args, loglevel="info", sep=" "):
     if env_loglevel != ryuu_log._last_env_loglevel:
         ryuu_logger.setLevel(getattr(logging, env_loglevel, logging.DEBUG))
         ryuu_logger.debug(
-            f"{prefix}{level_prefix} Log level set to: {env_loglevel} (should say DEBUG) | If this is unexpected/uninteded, 'RYUU_LOGLEVEL' may have been 'None' or empty."
+            f"{prefix}{level_prefix} {level_colors.get('debug', '')}Log level set to: {env_loglevel} (should say DEBUG) | If this is unexpected/uninteded, 'RYUU_LOGLEVEL' may have been 'None' or empty."
         )
         ryuu_log._last_env_loglevel = env_loglevel
 

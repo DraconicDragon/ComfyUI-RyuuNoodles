@@ -1,7 +1,7 @@
 import re
 
 from aiohttp import web
-from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast # type: ignore
+from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast
 
 from server import PromptServer  # type: ignore
 
@@ -30,6 +30,7 @@ def get_tokenizer(name):
         return _tokenizer_cache[key]
     if key == "clip_l":  # CLIP-L | SDXL, FLUX (2nd), SD3(.5), etc
         # NOTE: CLIP-L Fast tokenizer is NOT faster
+        # NOTE: Jina clip probably same as this (or clip G)
         tok = load_and_log(CLIPTokenizer, "openai/clip-vit-large-patch14", log_name="CLIP-L")
 
     # CLIP-G tok is practically almost exact same as CLIP-L tok
@@ -42,9 +43,10 @@ def get_tokenizer(name):
     # NOTE: below are LLM tokenizers, most output same or very similar token counts but they are NOT the same
     elif key == "t5":  # T5-XXL | Chroma, Flux (1st), SD3(.5), etc
         # # NOTE: BFL flux dev is also possible, but they should all do the same thing because same spiece.model file iirc
-        tok = load_and_log(T5Tokenizer, "google/t5-v1_1-xxl", log_name="T5")
+        tok = load_and_log(T5Tokenizer, "google/t5-v1_1-xxl", log_name="T5", legacy=False)
     elif key == "t5_fast":  # T5-XXL | Faster | Flux (1st), SD3(.5), etc
-        tok = load_and_log(T5TokenizerFast, "google/t5-v1_1-xxl", log_name="T5-Fast")
+        tok = load_and_log(T5TokenizerFast, "google/t5-v1_1-xxl", log_name="T5-Fast", legacy=False)
+        # legacy=False shouldnt impact anything, ref: https://github.com/huggingface/transformers/pull/24565
     elif key == "umt5":  # umt5-XXL | WAN 2.1
         tok = load_and_log(AutoTokenizer, "google/umt5-xxl", log_name="UMT5")
     elif key == "gemma2":  # Gemma 2 2B | Lumina Image 2.0

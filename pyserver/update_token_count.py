@@ -1,4 +1,5 @@
 import re
+import warnings
 
 from aiohttp import web
 from transformers import AutoTokenizer, CLIPTokenizer, T5Tokenizer, T5TokenizerFast
@@ -13,6 +14,18 @@ routes = PromptServer.instance.routes
 
 # Lazy tokenizer loader and cache
 _tokenizer_cache = {}
+
+
+class SuppressTokenizerWarnings:
+    def __enter__(self):
+        warnings.filterwarnings(
+            "ignore", message="Token indices sequence length is longer than the specified maximum.*"
+        )
+        return self
+
+    def __exit__(self, *args):
+        # Reset warning filters to default state
+        warnings.resetwarnings()
 
 
 def load_and_log(tokenizer_cls, *args, log_name=None, **kwargs):
@@ -124,7 +137,8 @@ def handle_clip_l_breaks(text, tokenizer, add_special_tokens=False):
     """Handle BREAK keywords for CLIP-L tokenizer with 75-token chunking"""
     if "BREAK" not in text:
         # No BREAK found, tokenize normally
-        outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
+        with SuppressTokenizerWarnings():
+            outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
         return outputs["input_ids"].shape[1]
 
     # Split text by BREAK and process each chunk
@@ -134,7 +148,8 @@ def handle_clip_l_breaks(text, tokenizer, add_special_tokens=False):
 
     for i, chunk in enumerate(chunks):
         # Tokenize the current chunk
-        outputs = tokenizer(chunk, return_tensors="pt", add_special_tokens=add_special_tokens)
+        with SuppressTokenizerWarnings():
+            outputs = tokenizer(chunk, return_tensors="pt", add_special_tokens=add_special_tokens)
         chunk_tokens = outputs["input_ids"].shape[1]
 
         # For all but the last chunk, always count as a full 75-token chunk
@@ -178,7 +193,11 @@ async def update_token_count(request):
             num = handle_clip_l_breaks(text, tokenizer, add_special_tokens)
         else:
             # Standard tokenization for other tokenizers
-            outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
+            if name.lower().strip() == "clip_l":
+                with SuppressTokenizerWarnings():
+                    outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
+            else:
+                outputs = tokenizer(text, return_tensors="pt", add_special_tokens=add_special_tokens)
             num = outputs["input_ids"].shape[1]
 
         token_counts[name] = num

@@ -159,8 +159,11 @@ class ScaleToMultipleLatentSizePicker:
         # Create latent tensor
         latent = torch.zeros([batch_size, 4, final_height // 8, final_width // 8], device=self.device)
 
-        return (
-            {"samples": latent},
-            final_width,
-            final_height,
-        )
+        return {
+            "ui": {"value": [final_width, final_height]},
+            "result": (
+                {"samples": latent},
+                final_width,
+                final_height,
+            ),
+        }

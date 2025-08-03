@@ -15,6 +15,7 @@ app.registerExtension({
     },
     beforeRegisterNodeDef(nodeType) {
         if (nodeType.comfyClass === "Ryuu_ScaleToMultipleLatentSizePicker") {
+            // NOTE: won't run inside subgraphs... well i hope it's a frontend issue
             const onDrawForeground = nodeType.prototype.onDrawForeground;
 
 

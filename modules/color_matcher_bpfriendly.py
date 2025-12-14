@@ -5,48 +5,22 @@
 import numpy as np
 import torch
 
+from comfy_api.latest import io
+
 from ..modules.shared.ryuu_log import ryuu_log
 
 
-class ColorMatch:
+class ColorMatch(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_target": ("IMAGE",),
-                "image_ref": ("IMAGE",),
-                "method": (
-                    [
-                        "mkl",
-                        "hm",
-                        "reinhard",
-                        "mvgd",
-                        "hm-mvgd-hm",
-                        "hm-mkl-hm",
-                    ],
-                    {
-                        "default": "mkl",
-                        "tooltip": (
-                            "Color transfer method to use. "
-                            "I personally like 'mkl' most because it transfers colors well with least 'artifacts' "
-                            "in scenarios where both input images are structually the same or very close to same."
-                        ),
-                    },
-                ),
-            },
-            "optional": {
-                "strength": ("FLOAT", {"default": 0.97, "min": 0.0, "max": 10.0, "step": 0.005}),
-            },
-        }
-
-    CATEGORY = "RyuuNoodles 🐲/Images"
-
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("image",)
-    FUNCTION = "colormatch"
-    DESCRIPTION = """
-This is the same Color Match node as from https://github.com/kijai/ComfyUI-KJNodes except that it is modified to be bypass friendly
-so that during bypass, the target image will be passed through rather than the reference image.
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="Ryuu_ColorMatch",
+            display_name="Color Match 🐲",
+            category="RyuuNoodles 🐲/Images",
+            description="""
+This is the nearly same Color Match node as from https://github.com/kijai/ComfyUI-KJNodes except that it is modified to be bypass friendly
+so that during bypass, the target image will be passed through rather than the reference image. 
+(Other changes: Multithreading is missing and images are in fp64 tensors instead of fp32 for really high-res images.)
 
 color-matcher enables color transfer across images which comes in handy for automatic
 color-grading of photographs, paintings and film sequences as well as light-field
@@ -58,14 +32,41 @@ to a Multi-Variate Gaussian Distribution (MVGD) transfer in conjunction with cla
 matching. As shown below our HM-MVGD-HM compound outperforms existing methods.
 https://github.com/hahnec/color-matcher/
 
-"""
+""",  # noqa: W291
+            inputs=[
+                io.Image.Input(name="image_target", description="Target image to apply color transfer to."),
+                io.Image.Input(name="image_ref", description="Reference image to take colors from."),
+                io.Combo.Input(
+                    options=["mkl", "hm", "reinhard", "mvgd", "hm-mvgd-hm", "hm-mkl-hm"],
+                    name="method",
+                    default="mkl",
+                    description=(
+                        "Color transfer method to use. "
+                        "I personally like 'mkl' most because it transfers colors well with least 'artifacts' "
+                        "in scenarios where both input images are structually the same or very close to same."
+                    ),
+                ),
+                io.Float.Input(
+                    name="strength",
+                    default=1.0,
+                    min=0.0,
+                    max=10.0,
+                    step=0.005,
+                    description="Strength of the color transfer effect.",
+                ),
+            ],
+            outputs=[
+                io.Image.Output(name="image", description="Image after color transfer."),
+            ],
+        )
 
-    def colormatch(self, image_target, image_ref, method, strength=1.0):
+    @classmethod
+    def execute(cls, image_target, image_ref, method, strength) -> io.NodeOutput:
         try:
             from color_matcher import ColorMatcher
         except:
             raise Exception(
-                "[RyuuNoodles Color Match] Can't import color-matcher, did you install requirements.txt? Manual install: pip install color-matcher"
+                "[RyuuNoodles Color Match] Can't import color-matcher, were the custom nodes installed correctly?"
             )
         cm = ColorMatcher()
         image_ref = image_ref.cpu()
@@ -79,7 +80,9 @@ https://github.com/hahnec/color-matcher/
         images_target_np = images_target.numpy()
 
         if image_ref.size(0) > 1 and image_ref.size(0) != batch_size:
-            raise ValueError("[RyuuNoodles Color Match] Use either single reference image or a matching batch of reference images.")
+            raise ValueError(
+                "[RyuuNoodles Color Match] Use either single reference image or a matching batch of reference images."
+            )
 
         for i in range(batch_size):
             image_target_np_i = images_target_np if batch_size == 1 else images_target[i].numpy()
@@ -104,4 +107,5 @@ https://github.com/hahnec/color-matcher/
 
         out = torch.stack(out, dim=0).to(torch.float32)
         out.clamp_(0, 1)
-        return (out,)
+
+        return io.NodeOutput(out)

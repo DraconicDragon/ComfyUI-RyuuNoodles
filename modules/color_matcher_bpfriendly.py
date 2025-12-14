@@ -37,8 +37,9 @@ https://github.com/hahnec/color-matcher/
                 io.Image.Input(name="image_target", description="Target image to apply color transfer to."),
                 io.Image.Input(name="image_ref", description="Reference image to take colors from."),
                 io.Combo.Input(
-                    options=["mkl", "hm", "reinhard", "mvgd", "hm-mvgd-hm", "hm-mkl-hm"],
                     name="method",
+                    display_name="Method",
+                    options=["mkl", "hm", "reinhard", "mvgd", "hm-mvgd-hm", "hm-mkl-hm"],
                     default="mkl",
                     description=(
                         "Color transfer method to use. "

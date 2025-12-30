@@ -63,7 +63,7 @@ class IsMultipleOf:
         "Outputs Booleans. If number_b is not given, will output None."
     )
 
-    CATEGORY = "RyuuNoodles/Utils"
+    CATEGORY = "RyuuNoodles 🐲/Numbers"
 
     def check_multiple(self, number_a, multiple, error_if_b_none, false_instead_none, number_b=None):
         if number_b is None and error_if_b_none:

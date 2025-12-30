@@ -18,7 +18,7 @@ class ScaleToMultipleBase:
     RETURN_TYPES = ("IMAGE", "INT", "INT")
     RETURN_NAMES = ("scaled_image", "scaled_width", "scaled_height")
     FUNCTION = "main_operation"
-    CATEGORY = "RyuuNoodles/Utils"
+    CATEGORY = "RyuuNoodles 🐲/Images"
 
     @classmethod
     def INPUT_TYPES(cls):

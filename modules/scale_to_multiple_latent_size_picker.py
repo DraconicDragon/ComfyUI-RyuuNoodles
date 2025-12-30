@@ -118,7 +118,7 @@ class ScaleToMultipleLatentSizePicker:
     RETURN_TYPES = ("LATENT", "INT", "INT")
     RETURN_NAMES = ("latent", "width", "height")
     FUNCTION = "execute"
-    CATEGORY = "RyuuNoodles/Utils"
+    CATEGORY = "RyuuNoodles 🐲/Latents"
 
     DESCRIPTION = (
         "Create latent samples with SDXL resolutions and scaling to multiple capabilities.\n"

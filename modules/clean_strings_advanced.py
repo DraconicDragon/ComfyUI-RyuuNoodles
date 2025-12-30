@@ -71,34 +71,37 @@ class CleanStringAdvanced:
                         "lowercase",
                         "uppercase",
                         "capitalize",
-                        "titlecase",
+                        "capitalize_1st_letter",
                         "camelcase",
                         "pascalcase",
                         "snakecase",
                         "kebabcase",
+                        "titlecase",
                     ],
                     {
                         "default": "off",
                         "tooltip": (
                             "Change the case of the string. Examples with input 'apple, banana, orange.':\n"
-                            "off = no change ('apple, banana, orange.')\n"
-                            "lowercase = all lowercase ('apple, banana, orange.')\n"
-                            "uppercase = ALL UPPERCASE ('APPLE, BANANA, ORANGE.')\n"
-                            "capitalize = First letter uppercase, rest lowercase ('Apple, banana, orange.')\n"
-                            "titlecase = Every Word Capitalized ('Apple, Banana, Orange.')\n"
-                            "camelcase = likeThisExample ('appleBananaOrange.')\n"
-                            "pascalcase = LikeThisExample ('AppleBananaOrange.')\n"
-                            "snakecase = like_this_example ('apple_banana_orange.')\n"
-                        )
-                    }
-                )
+                            "off = no change ('apple, banana, orange. juice')\n"
+                            "lowercase = all lowercase ('apple, banana, orange. juice')\n"
+                            "uppercase = ALL UPPERCASE ('APPLE, BANANA, ORANGE. JUICE')\n\n"
+                            "capitalize = Capitalize the start of every sentence (after punctuation or empty lines) and lowercase the rest ('Apple, banana. Orange. Juice')\n\n"
+                            "capitalize_1st_letter = Capitalize only the first letter of the input string ('Apple, banana. orange. juice')\n\n"
+                            "camelcase = likeThisExample ('appleBananaOrange.Juice')\n"
+                            "pascalcase = LikeThisExample ('AppleBananaOrange.Juice')\n\n"
+                            "snakecase = like_this_example, always lowercase ('apple_banana_orange._juice')\n\n"
+                            "kebabcase = like-this-example, always lowercase ('apple-banana-orange.-juice')\n\n"
+                            "titlecase = Every Word Capitalized ('Apple, Banana, Orange. Juice')\n"
+                        ),
+                    },
+                ),
             }
         }
 
     CATEGORY = "RyuuNoodles 🐲/Text"
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
-    FUNCTION = "clean_text"
+    FUNCTION = "execute"
     EXPERIMENTAL = True
 
     DESCRIPTION = (
@@ -111,6 +114,35 @@ class CleanStringAdvanced:
         "\n"
         "Useful for normalizing input strings for consistent processing."
     )
+
+    def _capitalize_sentences(self, text: str) -> str:
+        lower_text = text.lower()
+        result_chars = []
+        capitalize_next = True
+        pending_blank_line = False
+        for char in lower_text:
+            if capitalize_next and char.isalpha():
+                result_chars.append(char.upper())
+                capitalize_next = False
+                pending_blank_line = False
+            else:
+                result_chars.append(char)
+                if char.isalpha():
+                    capitalize_next = False
+                    pending_blank_line = False
+            if char in ".!?":
+                capitalize_next = True
+                pending_blank_line = False
+            elif char == "\n":
+                if pending_blank_line:
+                    capitalize_next = True
+                else:
+                    pending_blank_line = True
+            elif char in " \t\r":
+                pass
+            else:
+                pending_blank_line = False
+        return "".join(result_chars)
 
     def _collapse_spaces_comma(self, collapse_commas: bool, text: str) -> str:
         # Collapse multiple spaces into one (ignoring newlines)
@@ -140,9 +172,9 @@ class CleanStringAdvanced:
         elif case == "uppercase":
             return text.upper()
         elif case == "capitalize":
-            return text.capitalize()
-        elif case == "titlecase":
-            return text.title()
+            return self._capitalize_sentences(text)
+        elif case == "capitalize_1st_letter":
+            return text[0].upper() + text[1:] if text else text
         elif case == "camelcase":
             words = re.split(r"[\s,_-]+", text)
             if not words:
@@ -159,10 +191,20 @@ class CleanStringAdvanced:
         elif case == "kebabcase":
             words = re.split(r"[\s,_-]+", text)
             return "-".join(w.lower() for w in words if w)
+        elif case == "titlecase":
+            # str.title() works but also captializes after apostrophes etc, so its manually here
+            words = re.split(r"(\W+)", text)  # Keeps delimiters
+            result = []
+            for word in words:
+                if word and word[0].isalpha():
+                    result.append(word[0].upper() + word[1:].lower())
+                else:
+                    result.append(word)
+            return "".join(result)
         else:
             return text
 
-    def clean_text(
+    def execute(
         self,
         input_text,
         case,

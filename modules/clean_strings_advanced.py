@@ -109,7 +109,7 @@ class CleanStringAdvanced:
         "- Strip whitespace (off/left/right/both) from the input string\n"
         "- Remove or add trailing comma from the input string\n"
         "- Collapse multiple spaces in the input string\n"
-        "- Convert to lowercase\n"
+        "- Convert to lowercase/uppercase and more\n"
         "- Control newline handling (off/remove empty/collapse lines)\n"
         "\n"
         "Useful for normalizing input strings for consistent processing."

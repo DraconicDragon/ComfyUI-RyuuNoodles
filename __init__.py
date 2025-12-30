@@ -21,11 +21,13 @@ from .modules.scale_to_multiple_latent_size_picker import (
 )
 from .modules.tenc_weight_diff_check import TextEncoderDiffCheck
 from .modules.token_count_textbox import TokenCountTextBox
-from .modules.z_test_node import RyuuTestNode
+from .modules.wait_node import WaitNode
 
 # to get the routes registered
-from .pyserver import update_token_count  # noqa: F401
-from .pyserver import loglevel  # noqa: F401
+from .pyserver import (
+    loglevel,  # noqa: F401
+    update_token_count,  # noqa: F401
+)
 
 NODE_CLASS_MAPPINGS = {
     # Switches and Passthrough nodes
@@ -51,7 +53,7 @@ NODE_CLASS_MAPPINGS = {
     "Ryuu_TextEncoderDiffCheck": TextEncoderDiffCheck,
     "Ryuu_ExtractAndSaveLora": ExtractAndSaveLora,
     "Ryuu_CleanStringAdvanced": CleanStringAdvanced,
-    "Ryuu_TestNode": RyuuTestNode,
+    "Ryuu_WaitNode": WaitNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less with custom scripts?
@@ -73,7 +75,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {  # maybe use 🍜 instead so colors clash less wi
     "Ryuu_TextEncoderDiffCheck": "Check Text Encoder Diff 🐲",
     "Ryuu_ExtractAndSaveLora": "Extract and Save Lora 🐲",
     "Ryuu_CleanStringAdvanced": "Clean String Adv. 🐲",
-    "Ryuu_TestNode": "🚧 Ryuu Test Node 🐲",
+    "Ryuu_WaitNode": "Wait Seconds 🐲",
 }
 
 WEB_DIRECTORY = "./js"

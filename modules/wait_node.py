@@ -21,6 +21,8 @@ class WaitNode:
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "execute"
     CATEGORY = "RyuuNoodles 🐲/Utils"
+    EXPERIMENTAL = True
+
 
     def execute(self, images, seconds):
         """

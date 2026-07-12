@@ -193,6 +193,9 @@ window.addEventListener("RyuuNoodles.TokenCounterOverlay.Toggle", (e) => {
         enabled
     );
 
+    const isReady = app.isGraphReady ?? (app.graph !== undefined && app.graph !== null);
+    if (!isReady) return;
+
     for (const node of Object.values(app.graph._nodes || {})) {
         if (node && node._mapConfigName) {
             if (enabled) {
